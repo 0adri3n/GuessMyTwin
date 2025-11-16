@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GuessMyTwin - Partie en cours</title>
+  <link rel="stylesheet" href="../styles/game.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 class="title">GuessMyTwin</h1>
+      <div class="game-info">
+        <div class="info-card">
+          <span class="info-label">Votre personnage :</span>
+          <span class="info-value" id="yourCharacter"></span>
+        </div>
+        <div class="info-card">
+          <span class="info-label">Room :</span>
+          <span class="info-value" id="roomId"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-content">
+      <div class="sidebar">
+        <div class="your-character-card">
+          <h3>Votre personnage</h3>
+          <div class="character-display">
+            <img id="yourCharacterImage" src="/placeholder.svg" alt="Votre personnage">
+            <p id="yourCharacterName"></p>
+          </div>
+          <div class="character-hint">
+            Ne le révélez pas à votre adversaire !
+          </div>
+        </div>
+
+        <button class="btn btn-guess" id="guessBtn">
+          🎯 Deviner le personnage
+        </button>
+
+        <div class="game-status" id="gameStatus">
+          <p>Éliminez les personnages pour trouver celui de votre adversaire</p>
+        </div>
+      </div>
+
+      <div class="characters-grid" id="charactersGrid">
+        <!-- Les personnages seront ajoutés ici -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal pour deviner -->
+  <div class="modal" id="guessModal">
+    <div class="modal-content">
+      <h2>Devinez le personnage</h2>
+      <p>Sélectionnez le personnage que vous pensez être celui de votre adversaire :</p>
+      <div class="guess-grid" id="guessGrid">
+        <!-- Les personnages disponibles -->
+      </div>
+      <button class="btn btn-cancel" id="cancelGuessBtn">Annuler</button>
+    </div>
+  </div>
+
+  <!-- Modal de fin de partie -->
+  <div class="modal" id="gameOverModal">
+    <div class="modal-content">
+      <h2 id="gameOverTitle"></h2>
+      <div class="game-over-character">
+        <img id="winnerCharacterImage" src="/placeholder.svg" alt="">
+        <p id="winnerCharacterName"></p>
+      </div>
+      <button class="btn btn-primary" id="backToHomeBtn">Retour à l'accueil</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+  <script src="../scripts/game.js"></script>
+</body>
+</html>

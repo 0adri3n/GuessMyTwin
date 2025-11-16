@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GuessMyTwin - Lobby</title>
+  <link rel="stylesheet" href="../styles/lobby.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 class="title">GuessMyTwin</h1>
+      <div class="room-info">
+        <span class="room-label">Code de la room :</span>
+        <span class="room-id" id="roomIdDisplay"></span>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="players-section">
+        <h2>Joueurs</h2>
+        <div class="players-list" id="playersList">
+          <div class="player-card empty">
+            <div class="player-icon">👤</div>
+            <div class="player-name">En attente...</div>
+          </div>
+          <div class="player-card empty">
+            <div class="player-icon">👤</div>
+            <div class="player-name">En attente...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section" id="settingsSection">
+        <h2>Paramètres de la partie</h2>
+        
+        <div class="mode-selection">
+          <label class="mode-card">
+            <input type="radio" name="mode" value="classic" checked>
+            <div class="mode-content">
+              <div class="mode-icon">👥</div>
+              <div class="mode-title">Classique</div>
+              <div class="mode-description">Personnages traditionnels</div>
+            </div>
+          </label>
+          
+          <label class="mode-card">
+            <input type="radio" name="mode" value="animals">
+            <div class="mode-content">
+              <div class="mode-icon">🦁</div>
+              <div class="mode-title">Animaux</div>
+              <div class="mode-description">Animaux mignons</div>
+            </div>
+          </label>
+        </div>
+
+        <button class="btn btn-start" id="startGameBtn" disabled>
+          Lancer la partie
+        </button>
+
+        <div class="waiting-message" id="waitingMessage">
+          En attente d'un second joueur...
+        </div>
+      </div>
+
+      <div class="guest-waiting" id="guestWaiting" style="display: none;">
+        <h2>En attente...</h2>
+        <div class="spinner"></div>
+        <p>L'hôte va bientôt lancer la partie</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+  <script src="../scripts/lobby.js"></script>
+</body>
+</html>
