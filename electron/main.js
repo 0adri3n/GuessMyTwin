@@ -4,24 +4,25 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 
-
 let mainWindow;
-let server;
-let io;
 let httpServer;
+let io;
+let clientSocket; // Socket for guest mode
 
-// Gestion des rooms
-const rooms = new Map();
-console.log(path.join(__dirname, "preload.js"));
+let gameRoom = {
+  host: null,
+  players: [],
+  mode: null,
+  gameState: null
+};
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     webPreferences: {
-        preload: path.join(__dirname, "preload.js"),
-        contextIsolation: true,
-        nodeIntegration: false,
-        sandbox: false
+      nodeIntegration: true,
+      contextIsolation: false
     }
   });
 
@@ -30,10 +31,90 @@ function createWindow() {
   mainWindow.webContents.openDevTools();
 }
 
-// Démarrer le serveur Express + Socket.IO
-function startServer() {
-  const app = express();
-  httpServer = http.createServer(app);
+ipcMain.on('create-room', (event, data) => {
+  console.log('[v0] IPC: Create room request from', data.playerName);
+  
+  if (httpServer) {
+    event.reply('room-created', { playerName: data.playerName });
+    return;
+  }
+
+  startServerAsHost(data.playerName);
+  connectAsGuest('http://localhost:3000', data.playerName, event);
+  event.reply('room-created', { playerName: data.playerName });
+});
+
+ipcMain.on('join-room', (event, data) => {
+  console.log('[v0] IPC: Join room request from', data.playerName, 'to', data.serverUrl);
+  
+  connectAsGuest(data.serverUrl, data.playerName, event);
+});
+
+ipcMain.on('start-game', (event, data) => {
+  console.log('[v0] IPC: Start game request with mode', data.mode);
+  
+  // if (!io) return;
+  
+  gameRoom.mode = data.mode;
+  
+  const characters = getCharactersByMode(data.mode);
+  const player1Character = characters[Math.floor(Math.random() * characters.length)];
+  const player2Character = characters[Math.floor(Math.random() * characters.length)];
+  
+  gameRoom.gameState = {
+    characters: characters,
+    player1: { id: gameRoom.players[0].id, character: player1Character },
+    player2: { id: gameRoom.players[1].id, character: player2Character }
+  };
+
+  io.to(gameRoom.players[0].id).emit('game-started', {
+    characters: characters,
+    yourCharacter: player1Character,
+    opponentId: gameRoom.players[1].id
+  });
+
+  io.to(gameRoom.players[1].id).emit('game-started', {
+    characters: characters,
+    yourCharacter: player2Character,
+    opponentId: gameRoom.players[0].id
+  });
+
+  console.log('[v0] Current game state:', gameRoom);
+
+  console.log('[v0] Game started with mode', data.mode);
+});
+
+ipcMain.on('guess-character', (event, data) => {
+  console.log('[v0] IPC: Guess character request', data.characterId);
+  
+  if (io) {
+    // HOST mode
+    handleGuess(data.characterId, data.socketId);
+  } else if (clientSocket) {
+    // GUEST mode
+    clientSocket.emit('guess-character', { characterId: data.characterId });
+  }
+});
+
+ipcMain.on('get-room-info', (event) => {
+  console.log('[v0] IPC: Get room info request');
+  if (io) {
+    // HOST mode
+    event.reply('room-info', {
+      host: gameRoom.host,
+      players: gameRoom.players,
+      mode: gameRoom.mode,
+      gameState: gameRoom.gameState
+    });
+  } else if (clientSocket) {
+    // GUEST mode
+    clientSocket.emit('room-info', event);
+  }
+});
+
+function startServerAsHost(playerName) {
+  const expressApp = express();
+  httpServer = http.createServer(expressApp);
   io = new Server(httpServer, {
     cors: {
       origin: "*",
@@ -41,149 +122,166 @@ function startServer() {
     }
   });
 
-  app.use(express.static('public'));
 
-  // Socket.IO événements
+  expressApp.use(express.static('public'));
+
   io.on('connection', (socket) => {
-    console.log('Un joueur s\'est connecté:', socket.id);
+    console.log('[v0] HOST: Player connected:', socket.id);
 
-    // Créer une room
-    socket.on('create-room', (data) => {
-      const roomId = generateRoomId();
-      rooms.set(roomId, {
-        id: roomId,
-        host: socket.id,
-        players: [{ id: socket.id, name: data.playerName, ready: false }],
-        mode: null,
-        gameState: null
-      });
+    // First connection is always the host
+    if (gameRoom.players.length === 0) {
+      gameRoom.host = socket.id;
+      gameRoom.players = [{ id: socket.id, name: playerName, ready: false }];
+      console.log('[v0] HOST: Host player added to room');
       
-      socket.join(roomId);
-      socket.emit('room-created', { roomId, playerName: data.playerName });
-      console.log(`Room ${roomId} créée par ${data.playerName}`);
-    });
-
-    // Rejoindre une room
-    socket.on('join-room', (data) => {
-      const room = rooms.get(data.roomId);
-      
-      if (!room) {
-        socket.emit('error', { message: 'Room non trouvée' });
-        return;
-      }
-      
-      if (room.players.length >= 2) {
-        socket.emit('error', { message: 'Room complète' });
-        return;
-      }
-
-      room.players.push({ id: socket.id, name: data.playerName, ready: false });
-      socket.join(data.roomId);
-      
-      // Notifier tous les joueurs de la room
-      io.to(data.roomId).emit('player-joined', { 
-        players: room.players,
-        roomId: data.roomId
-      });
-      
-      console.log(`${data.playerName} a rejoint la room ${data.roomId}`);
-    });
-
-    // Lancer la partie
-    socket.on('start-game', (data) => {
-      const room = rooms.get(data.roomId);
-      
-      if (!room || room.host !== socket.id) {
-        return;
-      }
-
-      room.mode = data.mode;
-      
-      // Sélectionner des personnages aléatoires pour chaque joueur
-      const characters = getCharactersByMode(data.mode);
-      const player1Character = characters[Math.floor(Math.random() * characters.length)];
-      const player2Character = characters[Math.floor(Math.random() * characters.length)];
-      
-      room.gameState = {
-        characters: characters,
-        player1: { id: room.players[0].id, character: player1Character },
-        player2: { id: room.players[1].id, character: player2Character }
-      };
-
-      // Envoyer les données de jeu à chaque joueur
-      io.to(room.players[0].id).emit('game-started', {
-        characters: characters,
-        yourCharacter: player1Character,
-        opponentId: room.players[1].id
-      });
-
-      io.to(room.players[1].id).emit('game-started', {
-        characters: characters,
-        yourCharacter: player2Character,
-        opponentId: room.players[0].id
-      });
-
-      console.log(`Partie lancée dans la room ${data.roomId} avec le mode ${data.mode}`);
-    });
-
-    // Deviner le personnage
-    socket.on('guess-character', (data) => {
-      const room = rooms.get(data.roomId);
-      if (!room) return;
-
-      const guesser = room.gameState.player1.id === socket.id ? room.gameState.player1 : room.gameState.player2;
-      const opponent = room.gameState.player1.id === socket.id ? room.gameState.player2 : room.gameState.player1;
-
-      const isCorrect = data.characterId === opponent.character.id;
-
-      if (isCorrect) {
-        io.to(data.roomId).emit('game-over', {
-          winner: socket.id,
-          character: opponent.character
-        });
-      } else {
-        socket.emit('guess-wrong', { message: 'Ce n\'est pas le bon personnage!' });
-      }
-    });
-
-    // Déconnexion
-    socket.on('disconnect', () => {
-      console.log('Un joueur s\'est déconnecté:', socket.id);
-      
-      // Retirer le joueur de toutes les rooms
-      rooms.forEach((room, roomId) => {
-        const playerIndex = room.players.findIndex(p => p.id === socket.id);
-        if (playerIndex !== -1) {
-          room.players.splice(playerIndex, 1);
-          
-          if (room.players.length === 0) {
-            rooms.delete(roomId);
-          } else {
-            io.to(roomId).emit('player-left', { players: room.players });
-          }
+      // Notify renderer process
+      mainWindow.webContents.send('player-joined', { players: gameRoom.players });
+    } else if (gameRoom.players.length === 1) {
+      // Second connection is the guest
+      socket.on('join-room', (data) => {
+        if (gameRoom.players.length >= 2) {
+          socket.emit('error', { message: 'Room is full' });
+          return;
         }
+
+        gameRoom.players.push({ id: socket.id, name: data.playerName, ready: false });
+        
+        io.emit('player-joined-event', { players: gameRoom.players });
+        
+        // Notify renderer process
+        mainWindow.webContents.send('player-joined', { players: gameRoom.players });
+        
+        console.log('[v0] HOST: Guest joined the room');
       });
+    }
+
+    socket.on('room-info', (event) => {
+      socket.emit('room-info', {
+        host: gameRoom.host,
+        players: gameRoom.players,
+        mode: gameRoom.mode,
+        gameState: gameRoom.gameState
+      });
+    });
+
+    socket.on('guess-character', (data) => {
+      handleGuess(data.characterId, socket.id);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('[v0] HOST: Player disconnected:', socket.id);
+      
+      const playerIndex = gameRoom.players.findIndex(p => p.id === socket.id);
+      if (playerIndex !== -1) {
+        gameRoom.players.splice(playerIndex, 1);
+        
+        if (gameRoom.players.length === 0) {
+          gameRoom = {
+            host: null,
+            players: [],
+            mode: null,
+            gameState: null
+          };
+        } else {
+          io.emit('player-left-event', { players: gameRoom.players });
+          mainWindow.webContents.send('player-left', { players: gameRoom.players });
+        }
+      }
     });
   });
 
-    httpServer.listen(0, () => {
-        const port = httpServer.address().port;
-        console.log("Serveur interne sur :", port);
+  const PORT = 3000;
+  httpServer.listen(PORT, () => {
+    console.log('[v0] HOST: Server started on port', PORT);
+  });
 
-        // ENVOI DU PORT AU RENDERER via IPC
-        if (mainWindow) {
-            mainWindow.webContents.send("server-port", port);
-        }
-    });
 
 }
 
-function generateRoomId() {
-  return Math.random().toString(36).substring(2, 8).toUpperCase();
+function connectAsGuest(serverUrl, playerName, event) {
+  const io = require('socket.io-client');
+  clientSocket = io(serverUrl);
+  
+  clientSocket.on('connect', () => {
+    console.log('[v0] GUEST: Connected to server');
+    clientSocket.emit('join-room', { playerName });
+  });
+  
+  clientSocket.on('connect_error', (error) => {
+    console.log('[v0] GUEST: Connection error', error);
+    event.reply('join-error', { message: 'Cannot connect to server' });
+  });
+
+  clientSocket.on('room-info', (data) => {
+    console.log('[v0] GUEST: Room info received');
+    console.log('[v0] Current game room state:', data);
+    mainWindow.webContents.send('room-info', {
+      host: data.host,
+      players: data.players,
+      mode: data.mode,
+      gameState: data.gameState
+    });
+  });
+  
+  clientSocket.on('player-joined-event', (data) => {
+    console.log('[v0] GUEST: Player joined event received');
+    event.reply('player-joined', { players: data.players });
+    mainWindow.webContents.send('player-joined', { players: data.players });
+  });
+  
+  clientSocket.on('player-left-event', (data) => {
+    console.log('[v0] GUEST: Player left event received');
+    mainWindow.webContents.send('player-left', { players: data.players });
+  });
+  
+  clientSocket.on('game-started', (data) => {
+    console.log('[v0] GUEST: Game started event received');
+    mainWindow.webContents.send('game-started', data);
+  });
+  
+  clientSocket.on('guess-wrong', (data) => {
+    console.log('[v0] GUEST: Wrong guess');
+    mainWindow.webContents.send('guess-wrong', data);
+  });
+  
+  clientSocket.on('game-over', (data) => {
+    console.log('[v0] GUEST: Game over');
+    mainWindow.webContents.send('game-over', data);
+  });
+  
+  clientSocket.on('error', (data) => {
+    console.log('[v0] GUEST: Error', data.message);
+    event.reply('join-error', data);
+  });
+}
+
+function handleGuess(characterId, socketId) {
+  if (!gameRoom.gameState) return;
+
+  const guesser = gameRoom.gameState.player1.id === socketId ? gameRoom.gameState.player1 : gameRoom.gameState.player2;
+  const opponent = gameRoom.gameState.player1.id === socketId ? gameRoom.gameState.player2 : gameRoom.gameState.player1;
+
+  const isCorrect = characterId === opponent.character.id;
+
+  if (isCorrect) {
+    const gameOverData = {
+      winner: socketId,
+      character: opponent.character
+    };
+    
+    if (io) {
+      io.emit('game-over', gameOverData);
+    }
+    mainWindow.webContents.send('game-over', gameOverData);
+  } else {
+    if (io) {
+      io.to(socketId).emit('guess-wrong', { message: 'Wrong character!' });
+    }
+    mainWindow.webContents.send('guess-wrong', { message: 'Wrong character!' });
+  }
 }
 
 function getCharactersByMode(mode) {
-  // Sets de personnages prédéfinis
   const modes = {
     classic: [
       { id: 1, name: 'Alice', image: '/woman-brown-hair.png' },
@@ -228,7 +326,6 @@ function getCharactersByMode(mode) {
 
 app.whenReady().then(() => {
   createWindow();
-  startServer();
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -238,6 +335,9 @@ app.whenReady().then(() => {
 app.on('window-all-closed', function () {
   if (httpServer) {
     httpServer.close();
+  }
+  if (clientSocket) {
+    clientSocket.disconnect();
   }
   if (process.platform !== 'darwin') app.quit();
 });

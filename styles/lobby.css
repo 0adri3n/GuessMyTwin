@@ -4,11 +4,67 @@
   box-sizing: border-box;
 }
 
+/* Added CSS variables for theme support */
+:root {
+  --bg-primary: #667eea;
+  --bg-secondary: #764ba2;
+  --text-primary: #333;
+  --text-secondary: #555;
+  --text-light: #999;
+  --card-bg: white;
+  --player-card-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --empty-card-bg: #f5f5f5;
+  --empty-card-border: #ddd;
+  --mode-card-bg: #f8f8f8;
+  --mode-card-border: #e0e0e0;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] {
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --text-primary: #eee;
+  --text-secondary: #ccc;
+  --text-light: #888;
+  --card-bg: #0f3460;
+  --player-card-bg: linear-gradient(135deg, #2a4f8f 0%, #4a2f6a 100%);
+  --empty-card-bg: #1a1a2e;
+  --empty-card-border: #2a2a4e;
+  --mode-card-bg: #1a1a2e;
+  --mode-card-border: #2a2a4e;
+  --shadow-color: rgba(0, 0, 0, 0.6);
+}
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   min-height: 100vh;
   padding: 20px;
+  transition: background 0.3s ease;
+}
+
+/* Added theme toggle button styles */
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  background: var(--card-bg);
+  box-shadow: 0 4px 12px var(--shadow-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
 }
 
 .container {
@@ -25,7 +81,7 @@ body {
 .title {
   font-size: 2.5rem;
   font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  text-shadow: 2px 2px 4px var(--shadow-color);
   margin-bottom: 15px;
 }
 
@@ -38,21 +94,15 @@ body {
 }
 
 .room-label {
-  margin-right: 10px;
   font-weight: 600;
 }
 
-.room-id {
-  font-size: 1.3rem;
-  font-weight: bold;
-  letter-spacing: 2px;
-}
-
 .content {
-  background: white;
+  background: var(--card-bg);
   border-radius: 20px;
   padding: 40px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 30px var(--shadow-color);
+  transition: background 0.3s ease;
 }
 
 .players-section {
@@ -65,6 +115,12 @@ body {
   font-size: 1.5rem;
 }
 
+[data-theme="dark"] .players-section h2,
+[data-theme="dark"] .settings-section h2,
+[data-theme="dark"] .guest-waiting h2 {
+  color: #8b9eff;
+}
+
 .players-list {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -72,7 +128,7 @@ body {
 }
 
 .player-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--player-card-bg);
   border-radius: 15px;
   padding: 30px;
   text-align: center;
@@ -81,9 +137,9 @@ body {
 }
 
 .player-card.empty {
-  background: #f5f5f5;
-  color: #999;
-  border: 2px dashed #ddd;
+  background: var(--empty-card-bg);
+  color: var(--text-light);
+  border: 2px dashed var(--empty-card-border);
 }
 
 .player-card:not(.empty):hover {
@@ -124,8 +180,8 @@ body {
 }
 
 .mode-content {
-  background: #f8f8f8;
-  border: 3px solid #e0e0e0;
+  background: var(--mode-card-bg);
+  border: 3px solid var(--mode-card-border);
   border-radius: 15px;
   padding: 30px;
   text-align: center;
@@ -183,7 +239,7 @@ body {
 .waiting-message {
   text-align: center;
   margin-top: 20px;
-  color: #999;
+  color: var(--text-light);
   font-style: italic;
 }
 
@@ -201,7 +257,7 @@ body {
 .spinner {
   width: 60px;
   height: 60px;
-  border: 5px solid #f3f3f3;
+  border: 5px solid var(--mode-card-border);
   border-top: 5px solid #667eea;
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -214,7 +270,7 @@ body {
 }
 
 .guest-waiting p {
-  color: #999;
+  color: var(--text-light);
   font-size: 1.1rem;
 }
 

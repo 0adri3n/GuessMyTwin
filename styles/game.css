@@ -4,11 +4,69 @@
   box-sizing: border-box;
 }
 
+/* Added CSS variables for theme support */
+:root {
+  --bg-primary: #667eea;
+  --bg-secondary: #764ba2;
+  --text-primary: #333;
+  --text-secondary: #666;
+  --text-light: #999;
+  --card-bg: white;
+  --sidebar-bg: white;
+  --character-card-bg: #f8f8f8;
+  --character-card-border: #e0e0e0;
+  --hint-bg: #fff3cd;
+  --hint-text: #856404;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --modal-bg: rgba(0, 0, 0, 0.7);
+}
+
+[data-theme="dark"] {
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --text-primary: #eee;
+  --text-secondary: #ccc;
+  --text-light: #888;
+  --card-bg: #0f3460;
+  --sidebar-bg: #0f3460;
+  --character-card-bg: #1a1a2e;
+  --character-card-border: #2a2a4e;
+  --hint-bg: #4a3a1a;
+  --hint-text: #ffd966;
+  --shadow-color: rgba(0, 0, 0, 0.6);
+  --modal-bg: rgba(0, 0, 0, 0.85);
+}
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   min-height: 100vh;
   padding: 20px;
+  transition: background 0.3s ease;
+}
+
+/* Added theme toggle button styles */
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  background: var(--card-bg);
+  box-shadow: 0 4px 12px var(--shadow-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
 }
 
 .container {
@@ -25,7 +83,7 @@ body {
 .title {
   font-size: 2rem;
   font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  text-shadow: 2px 2px 4px var(--shadow-color);
   margin-bottom: 15px;
 }
 
@@ -65,16 +123,21 @@ body {
 }
 
 .your-character-card {
-  background: white;
+  background: var(--sidebar-bg);
   border-radius: 20px;
   padding: 20px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 5px 15px var(--shadow-color);
+  transition: background 0.3s ease;
 }
 
 .your-character-card h3 {
   color: #667eea;
   margin-bottom: 15px;
   text-align: center;
+}
+
+[data-theme="dark"] .your-character-card h3 {
+  color: #8b9eff;
 }
 
 .character-display {
@@ -94,16 +157,16 @@ body {
 .character-display p {
   font-size: 1.2rem;
   font-weight: bold;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .character-hint {
-  background: #fff3cd;
+  background: var(--hint-bg);
   padding: 10px;
   border-radius: 10px;
   text-align: center;
   font-size: 0.85rem;
-  color: #856404;
+  color: var(--hint-text);
 }
 
 .btn {
@@ -128,30 +191,32 @@ body {
 }
 
 .game-status {
-  background: white;
+  background: var(--card-bg);
   border-radius: 20px;
   padding: 20px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 5px 15px var(--shadow-color);
   text-align: center;
-  color: #666;
+  color: var(--text-secondary);
   line-height: 1.6;
+  transition: background 0.3s ease;
 }
 
 .characters-grid {
-  background: white;
+  background: var(--card-bg);
   border-radius: 20px;
   padding: 30px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 5px 15px var(--shadow-color);
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 15px;
   max-height: calc(100vh - 200px);
   overflow-y: auto;
+  transition: background 0.3s ease;
 }
 
 .character-card {
-  background: #f8f8f8;
-  border: 3px solid #e0e0e0;
+  background: var(--character-card-bg);
+  border: 3px solid var(--character-card-border);
   border-radius: 15px;
   padding: 15px;
   text-align: center;
@@ -191,7 +256,7 @@ body {
 
 .character-card p {
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
 }
 
 /* Modal */
@@ -202,7 +267,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--modal-bg);
   z-index: 1000;
   align-items: center;
   justify-content: center;
@@ -213,19 +278,28 @@ body {
 }
 
 .modal-content {
-  background: white;
+  background: var(--card-bg);
   border-radius: 20px;
   padding: 40px;
   max-width: 800px;
   width: 90%;
   max-height: 80vh;
   overflow-y: auto;
+  transition: background 0.3s ease;
 }
 
 .modal-content h2 {
   color: #667eea;
   margin-bottom: 20px;
   text-align: center;
+}
+
+[data-theme="dark"] .modal-content h2 {
+  color: #8b9eff;
+}
+
+.modal-content p {
+  color: var(--text-secondary);
 }
 
 .guess-grid {
@@ -236,8 +310,8 @@ body {
 }
 
 .guess-card {
-  background: #f8f8f8;
-  border: 3px solid #e0e0e0;
+  background: var(--character-card-bg);
+  border: 3px solid var(--character-card-border);
   border-radius: 12px;
   padding: 10px;
   text-align: center;
@@ -261,13 +335,14 @@ body {
 .guess-card p {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .btn-cancel {
-  background: #f5f5f5;
-  color: #333;
+  background: var(--character-card-bg);
+  color: var(--text-primary);
   width: 100%;
+  border: 2px solid var(--character-card-border);
 }
 
 .btn-primary {
@@ -293,7 +368,7 @@ body {
 .game-over-character p {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #333;
+  color: var(--text-primary);
 }
 
 @media (max-width: 1024px) {

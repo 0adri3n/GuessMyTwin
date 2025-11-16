@@ -1,47 +1,86 @@
-var port = null;
-(async () => {
-  port = await window.serverInfo.getPort();
-  console.log("Port dispo :", port);
-})();
+const { ipcRenderer } = require('electron');
 
-const socket = io(`http://localhost:${port}`);
-const roomId = localStorage.getItem('roomId');
 const playerName = localStorage.getItem('playerName');
 const isHost = localStorage.getItem('isHost') === 'true';
 
-const roomIdDisplay = document.getElementById('roomIdDisplay');
 const playersList = document.getElementById('playersList');
 const settingsSection = document.getElementById('settingsSection');
 const guestWaiting = document.getElementById('guestWaiting');
 const startGameBtn = document.getElementById('startGameBtn');
 const waitingMessage = document.getElementById('waitingMessage');
+const themeToggle = document.getElementById('themeToggle');
 
 let players = [];
 
-// Afficher les informations de la room
-roomIdDisplay.textContent = roomId;
+function initTheme() {
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  updateThemeIcon(savedTheme);
+}
 
-// Afficher/masquer les sections selon le rôle
+function updateThemeIcon(theme) {
+  const icon = themeToggle.querySelector('.theme-icon');
+  icon.textContent = theme === 'light' ? '🌙' : '☀️';
+}
+
+themeToggle.addEventListener('click', () => {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+  updateThemeIcon(newTheme);
+});
+
+initTheme();
+
+function syncRoomInfo() {
+  ipcRenderer.send('get-room-info');
+}
+
+ipcRenderer.on('room-info', (event, data) => {
+  console.log('[v0] Room info received:', data);
+  players = data.players || [];
+  updatePlayersList();
+
+  if (isHost) {
+    if (players.length === 2) {
+      startGameBtn.disabled = false;
+      waitingMessage.style.display = 'none';
+    } else {
+      startGameBtn.disabled = true;
+      waitingMessage.style.display = 'block';
+    }
+  } else {
+    guestWaiting.style.display = players.length < 2 ? 'block' : 'none';
+  }
+});
+
+syncRoomInfo();
+
+console.log(`[v0] Lobby: Loaded as ${isHost ? 'HOST' : 'GUEST'}`);
+
 if (!isHost) {
   settingsSection.style.display = 'none';
   guestWaiting.style.display = 'block';
+  console.log('[v0] Guest: Waiting for host to start game...');
+} else {
+  console.log('[v0] Host: Waiting for guest to join...');
 }
 
-// Rejoindre automatiquement la room au chargement
-socket.emit('join-room', { playerName, roomId });
-
-// Mise à jour des joueurs
-socket.on('player-joined', (data) => {
+ipcRenderer.on('player-joined', (event, data) => {
+  console.log('[v0] Player joined, current players:', data.players.length);
   players = data.players;
   updatePlayersList();
   
   if (isHost && players.length === 2) {
     startGameBtn.disabled = false;
     waitingMessage.style.display = 'none';
+    console.log('[v0] Host: Ready to start game');
   }
 });
 
-socket.on('player-left', (data) => {
+ipcRenderer.on('player-left', (event, data) => {
+  console.log('[v0] Player left, current players:', data.players.length);
   players = data.players;
   updatePlayersList();
   
@@ -67,7 +106,7 @@ function updatePlayersList() {
       playerCard.className = 'player-card empty';
       playerCard.innerHTML = `
         <div class="player-icon">👤</div>
-        <div class="player-name">En attente...</div>
+        <div class="player-name">Waiting...</div>
       `;
     }
     
@@ -75,14 +114,16 @@ function updatePlayersList() {
   }
 }
 
-// Lancer la partie
 startGameBtn.addEventListener('click', () => {
+  if (!isHost) return;
+  
   const selectedMode = document.querySelector('input[name="mode"]:checked').value;
-  socket.emit('start-game', { roomId, mode: selectedMode });
+  console.log('[v0] Host: Starting game with mode:', selectedMode);
+  ipcRenderer.send('start-game', { mode: selectedMode });
 });
 
-// Redirection vers le jeu
-socket.on('game-started', (data) => {
+ipcRenderer.on('game-started', (event, data) => {
+  console.log('[v0] Game started, redirecting to game page...');
   localStorage.setItem('gameData', JSON.stringify(data));
   window.location.href = 'game.html';
 });

@@ -1,23 +1,25 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GuessMyTwin - Partie en cours</title>
+  <title>GuessMyTwin - Game</title>
   <link rel="stylesheet" href="../styles/game.css">
 </head>
 <body>
+  <!-- Added theme toggle button -->
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+    <span class="theme-icon">🌙</span>
+  </button>
+
   <div class="container">
     <div class="header">
       <h1 class="title">GuessMyTwin</h1>
       <div class="game-info">
+        <!-- Changed to English and removed room display -->
         <div class="info-card">
-          <span class="info-label">Votre personnage :</span>
+          <span class="info-label">Your character:</span>
           <span class="info-value" id="yourCharacter"></span>
-        </div>
-        <div class="info-card">
-          <span class="info-label">Room :</span>
-          <span class="info-value" id="roomId"></span>
         </div>
       </div>
     </div>
@@ -25,44 +27,46 @@
     <div class="game-content">
       <div class="sidebar">
         <div class="your-character-card">
-          <h3>Votre personnage</h3>
+          <!-- Changed to English -->
+          <h3>Your Character</h3>
           <div class="character-display">
-            <img id="yourCharacterImage" src="/placeholder.svg" alt="Votre personnage">
+            <img id="yourCharacterImage" src="/placeholder.svg" alt="Your character">
             <p id="yourCharacterName"></p>
           </div>
           <div class="character-hint">
-            Ne le révélez pas à votre adversaire !
+            Don't reveal it to your opponent!
           </div>
         </div>
 
         <button class="btn btn-guess" id="guessBtn">
-          🎯 Deviner le personnage
+          🎯 Guess Character
         </button>
 
         <div class="game-status" id="gameStatus">
-          <p>Éliminez les personnages pour trouver celui de votre adversaire</p>
+          <p>Eliminate characters to find your opponent's</p>
         </div>
       </div>
 
       <div class="characters-grid" id="charactersGrid">
-        <!-- Les personnages seront ajoutés ici -->
+        <!-- Characters will be added here -->
       </div>
     </div>
   </div>
 
-  <!-- Modal pour deviner -->
+  <!-- Guess modal -->
   <div class="modal" id="guessModal">
     <div class="modal-content">
-      <h2>Devinez le personnage</h2>
-      <p>Sélectionnez le personnage que vous pensez être celui de votre adversaire :</p>
+      <!-- Changed to English -->
+      <h2>Guess the Character</h2>
+      <p>Select the character you think is your opponent's:</p>
       <div class="guess-grid" id="guessGrid">
-        <!-- Les personnages disponibles -->
+        <!-- Available characters -->
       </div>
-      <button class="btn btn-cancel" id="cancelGuessBtn">Annuler</button>
+      <button class="btn btn-cancel" id="cancelGuessBtn">Cancel</button>
     </div>
   </div>
 
-  <!-- Modal de fin de partie -->
+  <!-- Game over modal -->
   <div class="modal" id="gameOverModal">
     <div class="modal-content">
       <h2 id="gameOverTitle"></h2>
@@ -70,7 +74,7 @@
         <img id="winnerCharacterImage" src="/placeholder.svg" alt="">
         <p id="winnerCharacterName"></p>
       </div>
-      <button class="btn btn-primary" id="backToHomeBtn">Retour à l'accueil</button>
+      <button class="btn btn-primary" id="backToHomeBtn">Back to Home</button>
     </div>
   </div>
 

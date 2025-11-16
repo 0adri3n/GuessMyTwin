@@ -1,45 +1,53 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GuessMyTwin - Accueil</title>
+  <title>GuessMyTwin - Home</title>
   <link rel="stylesheet" href="../styles/home.css">
 </head>
 <body>
+  <!-- Added theme toggle button -->
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+    <span class="theme-icon">🌙</span>
+  </button>
+
   <div class="container">
     <div class="header">
       <h1 class="title">GuessMyTwin</h1>
-      <p class="subtitle">Le jeu Qui est-ce? multijoueur</p>
+      <!-- Changed subtitle to English -->
+      <p class="subtitle">The multiplayer Guess Who game</p>
     </div>
 
     <div class="content">
       <div class="card">
-        <h2>Bienvenue !</h2>
+        <!-- Updated all text to English -->
+        <h2>Welcome!</h2>
         
         <div class="form-group">
-          <label for="playerName">Votre nom</label>
-          <input type="text" id="playerName" placeholder="Entrez votre nom" maxlength="20">
+          <label for="playerName">Your name</label>
+          <input type="text" id="playerName" placeholder="Enter your name" maxlength="20">
         </div>
 
         <div class="actions">
           <button class="btn btn-primary" id="createRoomBtn">
             <span class="btn-icon">+</span>
-            Créer une room
+            Create a room
           </button>
           
           <div class="divider">
-            <span>OU</span>
+            <span>OR</span>
           </div>
           
+          <!-- Changed from room code to server URL input -->
           <div class="form-group">
-            <label for="roomId">Code de la room</label>
-            <input type="text" id="roomId" placeholder="Ex: ABC123" maxlength="6">
+            <label for="serverUrl">Server URL</label>
+            <input type="text" id="serverUrl" placeholder="Ex: http://your-ngrok-url.ngrok.io">
           </div>
           
           <button class="btn btn-secondary" id="joinRoomBtn">
             <span class="btn-icon">→</span>
-            Rejoindre une room
+            Join a room
           </button>
         </div>
 
@@ -47,12 +55,12 @@
       </div>
 
       <div class="info">
-        <h3>Comment jouer ?</h3>
+        <h3>How to play?</h3>
         <ol>
-          <li>Créez une room ou rejoignez une room existante</li>
-          <li>Attendez qu'un second joueur rejoigne</li>
-          <li>L'hôte choisit le set de personnages et lance la partie</li>
-          <li>Devinez le personnage de votre adversaire !</li>
+          <li>Create a room or join an existing room via URL</li>
+          <li>Wait for a second player to join</li>
+          <li>The host chooses the character set and starts the game</li>
+          <li>Guess your opponent's character!</li>
         </ol>
       </div>
     </div>

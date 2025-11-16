@@ -1,18 +1,11 @@
+const { ipcRenderer } = require('electron');
 
-var port = null;
-(async () => {
-  port = await window.serverInfo.getPort();
-  console.log("Port dispo :", port);
-})();
-
-const socket = io(`http://localhost:${port}`);
-const roomId = localStorage.getItem('roomId');
+const isHost = localStorage.getItem('isHost') === 'true';
 const gameData = JSON.parse(localStorage.getItem('gameData'));
 
 const yourCharacter = gameData.yourCharacter;
 const characters = gameData.characters;
 
-const roomIdDisplay = document.getElementById('roomId');
 const yourCharacterDisplay = document.getElementById('yourCharacter');
 const yourCharacterImage = document.getElementById('yourCharacterImage');
 const yourCharacterName = document.getElementById('yourCharacterName');
@@ -23,16 +16,39 @@ const guessGrid = document.getElementById('guessGrid');
 const cancelGuessBtn = document.getElementById('cancelGuessBtn');
 const gameOverModal = document.getElementById('gameOverModal');
 const backToHomeBtn = document.getElementById('backToHomeBtn');
+const themeToggle = document.getElementById('themeToggle');
 
 let eliminatedCharacters = new Set();
+let mySocketId = gameData.opponentId; // Placeholder, will be set properly
 
-// Afficher les informations
-roomIdDisplay.textContent = roomId;
+function initTheme() {
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  updateThemeIcon(savedTheme);
+}
+
+function updateThemeIcon(theme) {
+  const icon = themeToggle.querySelector('.theme-icon');
+  icon.textContent = theme === 'light' ? '🌙' : '☀️';
+}
+
+themeToggle.addEventListener('click', () => {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+  updateThemeIcon(newTheme);
+});
+
+initTheme();
+
+console.log(`[v0] Game: Loaded as ${isHost ? 'HOST' : 'GUEST'}`);
+console.log(`[v0] Your character:`, yourCharacter.name);
+
 yourCharacterDisplay.textContent = yourCharacter.name;
 yourCharacterImage.src = yourCharacter.image;
 yourCharacterName.textContent = yourCharacter.name;
 
-// Afficher tous les personnages
 characters.forEach(character => {
   const card = document.createElement('div');
   card.className = 'character-card';
@@ -55,11 +71,9 @@ characters.forEach(character => {
   charactersGrid.appendChild(card);
 });
 
-// Bouton deviner
 guessBtn.addEventListener('click', () => {
   guessModal.classList.add('show');
   
-  // Afficher uniquement les personnages non éliminés
   guessGrid.innerHTML = '';
   characters.forEach(character => {
     if (!eliminatedCharacters.has(character.id) && character.id !== yourCharacter.id) {
@@ -71,7 +85,11 @@ guessBtn.addEventListener('click', () => {
       `;
       
       card.addEventListener('click', () => {
-        socket.emit('guess-character', { roomId, characterId: character.id });
+        console.log('[v0] Guessing character:', character.name);
+        ipcRenderer.send('guess-character', { 
+          characterId: character.id,
+          socketId: mySocketId 
+        });
         guessModal.classList.remove('show');
       });
       
@@ -84,21 +102,22 @@ cancelGuessBtn.addEventListener('click', () => {
   guessModal.classList.remove('show');
 });
 
-// Mauvaise réponse
-socket.on('guess-wrong', (data) => {
+ipcRenderer.on('guess-wrong', (event, data) => {
+  console.log('[v0] Wrong guess!');
   alert(data.message);
 });
 
-// Fin de partie
-socket.on('game-over', (data) => {
-  const isWinner = data.winner === socket.id;
+ipcRenderer.on('game-over', (event, data) => {
+  const isWinner = data.winner === mySocketId;
+  
+  console.log(`[v0] Game over! ${isWinner ? 'You won!' : 'You lost!'}`);
   
   document.getElementById('gameOverTitle').textContent = 
-    isWinner ? '🎉 Vous avez gagné !' : '😢 Vous avez perdu !';
+    isWinner ? '🎉 You Won!' : '😢 You Lost!';
   
   document.getElementById('winnerCharacterImage').src = data.character.image;
   document.getElementById('winnerCharacterName').textContent = 
-    `Le personnage était : ${data.character.name}`;
+    `The character was: ${data.character.name}`;
   
   gameOverModal.classList.add('show');
 });

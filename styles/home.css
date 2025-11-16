@@ -4,14 +4,72 @@
   box-sizing: border-box;
 }
 
+/* Added CSS variables for theme support */
+:root {
+  --bg-primary: #667eea;
+  --bg-secondary: #764ba2;
+  --text-primary: #333;
+  --text-secondary: #555;
+  --text-light: #999;
+  --card-bg: white;
+  --input-bg: white;
+  --input-border: #e0e0e0;
+  --divider-color: #e0e0e0;
+  --error-bg: #fee;
+  --error-text: #c33;
+  --btn-secondary-bg: #f5f5f5;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] {
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --text-primary: #eee;
+  --text-secondary: #ccc;
+  --text-light: #888;
+  --card-bg: #0f3460;
+  --input-bg: #1a1a2e;
+  --input-border: #2a2a4e;
+  --divider-color: #2a2a4e;
+  --error-bg: #4a1a1a;
+  --error-text: #ff6b6b;
+  --btn-secondary-bg: #1a1a2e;
+  --shadow-color: rgba(0, 0, 0, 0.6);
+}
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
+  transition: background 0.3s ease;
+}
+
+/* Added theme toggle button styles */
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  background: var(--card-bg);
+  box-shadow: 0 4px 12px var(--shadow-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
 }
 
 .container {
@@ -28,7 +86,7 @@ body {
 .title {
   font-size: 3.5rem;
   font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  text-shadow: 2px 2px 4px var(--shadow-color);
   margin-bottom: 10px;
 }
 
@@ -44,16 +102,21 @@ body {
 }
 
 .card {
-  background: white;
+  background: var(--card-bg);
   border-radius: 20px;
   padding: 40px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 30px var(--shadow-color);
+  transition: background 0.3s ease;
 }
 
 .card h2 {
   color: #667eea;
   margin-bottom: 30px;
   font-size: 1.8rem;
+}
+
+[data-theme="dark"] .card h2 {
+  color: #8b9eff;
 }
 
 .form-group {
@@ -63,17 +126,19 @@ body {
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  color: #333;
+  color: var(--text-primary);
   font-weight: 600;
 }
 
 .form-group input {
   width: 100%;
   padding: 12px 16px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--input-border);
   border-radius: 10px;
   font-size: 1rem;
   transition: border-color 0.3s;
+  background: var(--input-bg);
+  color: var(--text-primary);
 }
 
 .form-group input:focus {
@@ -116,9 +181,9 @@ body {
 }
 
 .btn-secondary {
-  background: #f5f5f5;
-  color: #333;
-  border: 2px solid #e0e0e0;
+  background: var(--btn-secondary-bg);
+  color: var(--text-primary);
+  border: 2px solid var(--input-border);
 }
 
 .btn-icon {
@@ -138,7 +203,7 @@ body {
   top: 50%;
   width: 40%;
   height: 1px;
-  background: #e0e0e0;
+  background: var(--divider-color);
 }
 
 .divider::before {
@@ -150,9 +215,9 @@ body {
 }
 
 .divider span {
-  background: white;
+  background: var(--card-bg);
   padding: 0 10px;
-  color: #999;
+  color: var(--text-light);
   font-size: 0.9rem;
 }
 
@@ -160,8 +225,8 @@ body {
   margin-top: 20px;
   padding: 12px;
   border-radius: 8px;
-  background: #fee;
-  color: #c33;
+  background: var(--error-bg);
+  color: var(--error-text);
   display: none;
   text-align: center;
   font-weight: 600;
@@ -175,7 +240,11 @@ body {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 20px;
   padding: 40px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 30px var(--shadow-color);
+}
+
+[data-theme="dark"] .info {
+  background: var(--card-bg);
 }
 
 .info h3 {
@@ -184,10 +253,14 @@ body {
   font-size: 1.5rem;
 }
 
+[data-theme="dark"] .info h3 {
+  color: #8b9eff;
+}
+
 .info ol {
   padding-left: 20px;
   line-height: 2;
-  color: #555;
+  color: var(--text-secondary);
 }
 
 .info li {
