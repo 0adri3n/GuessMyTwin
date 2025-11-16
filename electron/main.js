@@ -3,6 +3,7 @@ const path = require('path');
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
+const { pl } = require('date-fns/locale/pl');
 
 let mainWindow;
 let httpServer;
@@ -20,15 +21,17 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
+    autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation: false
+      contextIsolation: false,
     }
   });
 
   mainWindow.loadFile('pages/home.html');
   
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
+
 }
 
 ipcMain.on('create-room', (event, data) => {
@@ -53,7 +56,7 @@ ipcMain.on('join-room', (event, data) => {
 ipcMain.on('start-game', (event, data) => {
   console.log('[v0] IPC: Start game request with mode', data.mode);
   
-  // if (!io) return;
+  if (!io) return;
   
   gameRoom.mode = data.mode;
   
@@ -70,13 +73,13 @@ ipcMain.on('start-game', (event, data) => {
   io.to(gameRoom.players[0].id).emit('game-started', {
     characters: characters,
     yourCharacter: player1Character,
-    opponentId: gameRoom.players[1].id
+    yourId: gameRoom.players[0].id
   });
 
   io.to(gameRoom.players[1].id).emit('game-started', {
     characters: characters,
     yourCharacter: player2Character,
-    opponentId: gameRoom.players[0].id
+    yourId: gameRoom.players[1].id
   });
 
   console.log('[v0] Current game state:', gameRoom);
@@ -258,8 +261,25 @@ function connectAsGuest(serverUrl, playerName, event) {
 function handleGuess(characterId, socketId) {
   if (!gameRoom.gameState) return;
 
+  var opponent;
+
+  console.log(socketId)
+
+  if (gameRoom.gameState.player1.id === socketId) {
+    opponent = gameRoom.gameState.player2;
+  }
+  else {
+    opponent = gameRoom.gameState.player1;
+  }
+  
   const guesser = gameRoom.gameState.player1.id === socketId ? gameRoom.gameState.player1 : gameRoom.gameState.player2;
-  const opponent = gameRoom.gameState.player1.id === socketId ? gameRoom.gameState.player2 : gameRoom.gameState.player1;
+  // const opponent = gameRoom.gameState.player2.id === socketId ? gameRoom.gameState.player2 : gameRoom.gameState.player1;
+
+  console.log(guesser)
+  console.log(opponent)
+
+  console.log(`[v0] HOST: Player ${socketId} guessed character ID ${characterId}`);
+  console.log(`[v0] HOST: Opponent's character ID is ${opponent.character.name} (ID: ${opponent.character.id})`);
 
   const isCorrect = characterId === opponent.character.id;
 
@@ -281,43 +301,53 @@ function handleGuess(characterId, socketId) {
   }
 }
 
+const fs = require('fs');
+
+function imgToBase64(imagePath) {
+  const absPath = path.join(__dirname, 'assets', imagePath);
+  const file = fs.readFileSync(absPath);
+  const ext = path.extname(imagePath).substring(1);
+  return `data:image/${ext};base64,${file.toString('base64')}`;
+}
+
+
 function getCharactersByMode(mode) {
   const modes = {
     classic: [
-      { id: 1, name: 'Alice', image: '/woman-brown-hair.png' },
-      { id: 2, name: 'Bob', image: '/thoughtful-man-glasses.png' },
-      { id: 3, name: 'Charlie', image: '/bearded-man-portrait.png' },
-      { id: 4, name: 'Diana', image: '/blonde-woman-portrait.png' },
-      { id: 5, name: 'Eve', image: '/red-haired-woman.png' },
-      { id: 6, name: 'Frank', image: '/bald-man.png' },
-      { id: 7, name: 'Grace', image: '/curly-haired-woman.png' },
-      { id: 8, name: 'Henry', image: '/man-with-mustache.jpg' },
-      { id: 9, name: 'Iris', image: '/woman-black-hair.png' },
-      { id: 10, name: 'Jack', image: '/young-man-contemplative.png' },
-      { id: 11, name: 'Kate', image: '/short-haired-woman.png' },
-      { id: 12, name: 'Leo', image: '/man-with-fedora.png' },
-      { id: 13, name: 'Mia', image: '/woman-with-freckles.jpg' },
-      { id: 14, name: 'Noah', image: '/long-haired-man.png' },
-      { id: 15, name: 'Olivia', image: '/woman-with-pigtails.jpg' },
-      { id: 16, name: 'Paul', image: '/elderly-man-contemplative.png' }
+      { id: 1, name: 'Alice', image: '../public/woman-brown-hair.png' },
+      { id: 2, name: 'Bob', image: '../public/thoughtful-man-glasses.png' },
+      { id: 3, name: 'Charlie', image: '../public/bearded-man-portrait.png' },
+      { id: 4, name: 'Diana', image: '../public/blonde-woman-portrait.png' },
+      { id: 5, name: 'Eve', image: '../public/red-haired-woman.png' },
+      { id: 6, name: 'Frank', image: '../public/bald-man.png' },
+      { id: 7, name: 'Grace', image: '../public/curly-haired-woman.png' },
+      { id: 8, name: 'Henry', image: '../public/man-with-mustache.jpg' },
+      { id: 9, name: 'Iris', image: '../public/woman-black-hair.png' },
+      { id: 10, name: 'Jack', image: '../public/young-man-contemplative.png' },
+      { id: 11, name: 'Kate', image: '../public/short-haired-woman.png' },
+      { id: 12, name: 'Leo', image: '../public/man-with-fedora.png' },
+      { id: 13, name: 'Mia', image: '../public/woman-with-freckles.jpg' },
+      { id: 14, name: 'Noah', image: '../public/long-haired-man.png' },
+      { id: 15, name: 'Olivia', image: '../public/woman-with-pigtails.jpg' },
+      { id: 16, name: 'Paul', image: '../public/elderly-man-contemplative.png' }
     ],
     animals: [
-      { id: 17, name: 'Lion', image: '/cartoon-lion.png' },
-      { id: 18, name: 'Tiger', image: '/cartoon-tiger.jpg' },
-      { id: 19, name: 'Bear', image: '/cartoon-bear.png' },
-      { id: 20, name: 'Elephant', image: '/cartoon-elephant.png' },
-      { id: 21, name: 'Giraffe', image: '/cartoon-giraffe.png' },
-      { id: 22, name: 'Zebra', image: '/cartoon-zebra.png' },
-      { id: 23, name: 'Monkey', image: '/cartoon-monkey.png' },
-      { id: 24, name: 'Panda', image: '/cartoon-panda.jpg' },
-      { id: 25, name: 'Koala', image: '/cartoon-koala.jpg' },
-      { id: 26, name: 'Penguin', image: '/cartoon-penguin.png' },
-      { id: 27, name: 'Dolphin', image: '/cartoon-dolphin.png' },
-      { id: 28, name: 'Owl', image: '/cartoon-owl.png' },
-      { id: 29, name: 'Fox', image: '/cartoon-fox.png' },
-      { id: 30, name: 'Rabbit', image: '/cartoon-rabbit.png' },
-      { id: 31, name: 'Deer', image: '/cartoon-deer.jpg' },
-      { id: 32, name: 'Squirrel', image: '/cartoon-squirrel.jpg' }
+      { id: 17, name: 'Lion', image: '../public/cartoon-lion.png' },
+      { id: 18, name: 'Tiger', image: '../public/cartoon-tiger.jpg' },
+      { id: 19, name: 'Bear', image: '../public/cartoon-bear.png' },
+      { id: 20, name: 'Elephant', image: '../public/cartoon-elephant.png' },
+      { id: 21, name: 'Giraffe', image: '../public/cartoon-giraffe.png' },
+      { id: 22, name: 'Zebra', image: '../public/cartoon-zebra.png' },
+      { id: 23, name: 'Monkey', image: '../public/cartoon-monkey.png' },
+      { id: 24, name: 'Panda', image: '../public/cartoon-panda.jpg' },
+      { id: 25, name: 'Koala', image: '../public/cartoon-koala.jpg' },
+      { id: 26, name: 'Penguin', image: '../public/cartoon-penguin.png' },
+      { id: 27, name: 'Dolphin', image: '../public/cartoon-dolphin.png' },
+      { id: 28, name: 'Owl', image: '../public/cartoon-owl.png' },
+      { id: 29, name: 'Fox', image: '../public/cartoon-fox.png' },
+      { id: 30, name: 'Rabbit', image: '../public/cartoon-rabbit.png' },
+      { id: 31, name: 'Deer', image: '../public/cartoon-deer.jpg' },
+      { id: 32, name: 'Squirrel', image: '../public/cartoon-squirrel.jpg' }
     ]
   };
 

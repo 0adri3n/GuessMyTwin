@@ -2,7 +2,7 @@ const { ipcRenderer } = require('electron');
 
 const isHost = localStorage.getItem('isHost') === 'true';
 const gameData = JSON.parse(localStorage.getItem('gameData'));
-
+console.log('[v0] Loaded game data:', gameData);
 const yourCharacter = gameData.yourCharacter;
 const characters = gameData.characters;
 
@@ -19,7 +19,8 @@ const backToHomeBtn = document.getElementById('backToHomeBtn');
 const themeToggle = document.getElementById('themeToggle');
 
 let eliminatedCharacters = new Set();
-let mySocketId = gameData.opponentId; // Placeholder, will be set properly
+let mySocketId = gameData.yourId; // Placeholder, will be set properly
+console.log('[v0] My socket ID:', mySocketId);
 
 function initTheme() {
   const savedTheme = localStorage.getItem('theme') || 'light';
@@ -44,6 +45,7 @@ initTheme();
 
 console.log(`[v0] Game: Loaded as ${isHost ? 'HOST' : 'GUEST'}`);
 console.log(`[v0] Your character:`, yourCharacter.name);
+
 
 yourCharacterDisplay.textContent = yourCharacter.name;
 yourCharacterImage.src = yourCharacter.image;
