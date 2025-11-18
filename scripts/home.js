@@ -26,6 +26,9 @@ const cancelProfileBtn = document.getElementById('cancelProfileBtn');
 const howToPlayBtn = document.getElementById('howToPlayBtn');
 const howToPlayModal = document.getElementById('howToPlayModal');
 const closeHowToPlayBtn = document.getElementById('closeHowToPlayBtn');
+const createModInfoBtn = document.getElementById('createModInfoBtn');
+const createModModal = document.getElementById('createModModal');
+const closeCreateModBtn = document.getElementById('closeCreateModBtn');
 
 
 function initTheme() {
@@ -213,3 +216,20 @@ howToPlayModal.addEventListener('click', (e) => {
     howToPlayModal.classList.remove('show');
   }
 });
+
+// Create Mod instructions modal handlers
+if (createModInfoBtn && createModModal && closeCreateModBtn) {
+  createModInfoBtn.addEventListener('click', () => {
+    createModModal.classList.add('show');
+  });
+
+  closeCreateModBtn.addEventListener('click', () => {
+    createModModal.classList.remove('show');
+  });
+
+  createModModal.addEventListener('click', (e) => {
+    if (e.target === createModModal) {
+      createModModal.classList.remove('show');
+    }
+  });
+}

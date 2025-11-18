@@ -45,8 +45,8 @@ function saveMods(mods) {
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    width: 1150,
+    height: 950,
     autoHideMenuBar: true,
     icon: path.join(__dirname, "../pages/img/logo.png"),
     webPreferences: {

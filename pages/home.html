@@ -13,6 +13,9 @@
   <button class="htp-btn" aria-label="How to play ?">
     <span class="btn-icon" id="howToPlayBtn">❓</span>
   </button>
+  <button class="mod-info-btn" id="createModInfoBtn" aria-label="Create mod instructions">
+    <span class="btn-icon">📦</span>
+  </button>
   <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
     <span class="theme-icon">🌙</span>
   </button>
@@ -73,6 +76,8 @@
         <div class="error-message" id="errorMessage"></div>
       </div>
 
+      <!-- Create Mod instructions are shown in a popup modal (button at top) -->
+
     </div>
   </div>
 
@@ -112,6 +117,24 @@
         <li>The host chooses the character set and starts the game</li>
         <li>Guess your opponent's character!</li>
       </ol>
+    </div>
+  </div>
+
+  <!-- Create Mod instructions modal -->
+  <div class="how-to-play-modal" id="createModModal">
+    <div class="how-to-play-modal-content">
+      <div class="modal-header">
+        <h2>Create a Mod</h2>
+        <button class="close-modal" id="closeCreateModBtn">&times;</button>
+      </div>
+      <p>To add your own character set for the game, follow these steps:</p>
+      <ol>
+        <li>Click the "Create a Mod" button.</li>
+        <li>Select multiple image files (supported formats: <code>jpg</code>, <code>png</code>, <code>gif</code>, <code>webp</code>).</li>
+        <li>Choose a folder/name when prompted — the app will create a folder for the mod.</li>
+        <li>The application copies the selected images into the new folder and generates a <code>.json</code> configuration file describing the characters so the game can use them.</li>
+      </ol>
+      <p>After creation you can import the mod from the lobby and use it in your next game.</p>
     </div>
   </div>
 
