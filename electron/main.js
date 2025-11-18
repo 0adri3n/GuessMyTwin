@@ -168,6 +168,8 @@ ipcMain.on('start-game', (event, data) => {
     opponent: { name: gameRoom.players[1].name, avatar: imageToDataUri(gameRoom.players[1].avatar) }
   });
 
+  console.log(imageToDataUri(gameRoom.players[0].avatar));
+
   io.to(gameRoom.players[1].id).emit('game-started', {
     characters: charactersData,
     yourCharacter: player2CharData,
@@ -622,15 +624,22 @@ function handleGuess(characterId, socketId) {
 
   const isCorrect = characterId === opponent.character.id;
 
+  // Always send character images as data URIs
+  function withImageData(character) {
+    return {
+      ...character,
+      image: imageToDataUri(character.image)
+    };
+  }
+
   if (isCorrect) {
     const gameOverData = {
       winner: socketId,
-      guesser_character: guesser_character,
+      guesser_character: withImageData(guesser_character),
       guesser_name: guesser.name,
-      opponent_character: opponent.character,
+      opponent_character: withImageData(opponent.character),
       opponent_name: opponent.name
     };
-    
     if (io) {
       io.emit('game-over', gameOverData);
     }
@@ -638,12 +647,11 @@ function handleGuess(characterId, socketId) {
   } else {
     const gameOverData = {
       winner: opponent.id,
-      guesser_character: guesser_character,
+      guesser_character: withImageData(guesser_character),
       guesser_name: guesser.name,
-      opponent_character: opponent.character,
+      opponent_character: withImageData(opponent.character),
       opponent_name: opponent.name
     };
-    
     if (io) {
       io.emit('game-over', gameOverData);
     }

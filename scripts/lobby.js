@@ -1,3 +1,16 @@
+// Back to Menu button handler
+const backToMenuBtn = document.getElementById('backToMenuBtn');
+if (backToMenuBtn) {
+  backToMenuBtn.addEventListener('click', () => {
+    // Clean up sockets and go back to home
+    ipcRenderer.send('disconnect-socket');
+    localStorage.removeItem('playerName');
+    localStorage.removeItem('playerAvatar');
+    localStorage.removeItem('serverUrl');
+    localStorage.removeItem('isHost');
+    window.location.href = 'home.html';
+  });
+}
 const { ipcRenderer } = require('electron');
 
 const playerName = localStorage.getItem('playerName');
@@ -62,14 +75,14 @@ ipcRenderer.on('room-info', (event, data) => {
     } else {
       // Guest: waiting for host to start (or waiting for host/other player)
       guestWaiting.style.display = 'block';
-      waitingMessage.style.display = 'none';
+      waitingMessage.style.display = 'block';
       if (roomLabelEl) roomLabelEl.textContent = 'Waiting for host...';
     }
   } else {
     // Two players connected
     startGameBtn.disabled = !isHost; // only host can start
-    waitingMessage.style.display = isHost ? 'none' : 'none';
-    guestWaiting.style.display = 'none';
+    waitingMessage.style.display = isHost ? 'none' : 'block';
+    guestWaiting.style.display = 'block';
     if (roomLabelEl) {
       if (isHost) roomLabelEl.textContent = 'Players connected — ready to start';
       else roomLabelEl.textContent = 'All players connected — waiting for host to start';
@@ -162,10 +175,13 @@ ipcRenderer.on('player-joined', (event, data) => {
     // two players
     startGameBtn.disabled = !isHost;
     waitingMessage.style.display = 'none';
-    guestWaiting.style.display = 'none';
     if (roomLabelEl) {
       if (isHost) roomLabelEl.textContent = 'Players connected — ready to start';
-      else roomLabelEl.textContent = 'All players connected — waiting for host to start';
+      else {
+        roomLabelEl.textContent = 'All players connected — waiting for host to start';
+        guestWaiting.style.display = 'block';
+        document.getElementById('guestWaiting').style.display = 'block';
+      } 
     }
     if (isHost) console.log('[v0] Host: Ready to start game');
   }
@@ -242,7 +258,6 @@ ipcRenderer.on('game-started', (event, data) => {
 ipcRenderer.on('socket-disconnected', (event, data) => {
   console.log('[gmt] Socket disconnected event received in lobby:', data);
   if (!isHost) {
-    alert('Connection to the host/server was lost. Returning to home.');
     // clear session values and go to home
     localStorage.removeItem('playerName');
     localStorage.removeItem('playerAvatar');
