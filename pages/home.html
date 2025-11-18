@@ -51,7 +51,10 @@
           
           <div class="form-group">
             <label for="serverUrl">Server URL</label>
-            <input type="text" id="serverUrl" placeholder="Ex: http://your-ngrok-url.ngrok.io">
+            <input type="text" id="serverUrl" placeholder="Ex:  http://your.free.pinggy.link">
+            <div class="small-link">
+              <button class="link-btn" id="howToPlayOnlineBtn">How to play online ?</button>
+            </div>
           </div>
           
           <button class="btn btn-secondary" id="joinRoomBtn">
@@ -135,6 +138,21 @@
         <li>The application copies the selected images into the new folder and generates a <code>.json</code> configuration file describing the characters so the game can use them.</li>
       </ol>
       <p>After creation you can import the mod from the lobby and use it in your next game.</p>
+    </div>
+  </div>
+
+  <!-- How to play online (pinggy.link) modal -->
+  <div class="how-to-play-modal" id="howToPlayOnlineModal">
+    <div class="how-to-play-modal-content">
+      <div class="modal-header">
+        <h2>Play Online (tunneling method)</h2>
+        <button class="close-modal" id="closeHowToPlayOnlineBtn">&times;</button>
+      </div>
+      <p>To host a game accessible from the internet, you can create a tunnel using <code>pinggy.link</code>. On the host machine, run the following command:</p>
+      <br>
+      <pre><code>ssh -p 443 -R0:127.0.0.1:3000 qr@free.pinggy.io</code></pre>
+      <br>
+      <p>After running that command the service will provide a public URL (a <code>*.free.pinggy.io</code> address). Share that URL with the other player — they can paste it into the <strong>Server URL</strong> field and join your room.</p>
     </div>
   </div>
 

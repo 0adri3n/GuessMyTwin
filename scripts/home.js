@@ -29,6 +29,9 @@ const closeHowToPlayBtn = document.getElementById('closeHowToPlayBtn');
 const createModInfoBtn = document.getElementById('createModInfoBtn');
 const createModModal = document.getElementById('createModModal');
 const closeCreateModBtn = document.getElementById('closeCreateModBtn');
+const howToPlayOnlineBtn = document.getElementById('howToPlayOnlineBtn');
+const howToPlayOnlineModal = document.getElementById('howToPlayOnlineModal');
+const closeHowToPlayOnlineBtn = document.getElementById('closeHowToPlayOnlineBtn');
 
 
 function initTheme() {
@@ -230,6 +233,23 @@ if (createModInfoBtn && createModModal && closeCreateModBtn) {
   createModModal.addEventListener('click', (e) => {
     if (e.target === createModModal) {
       createModModal.classList.remove('show');
+    }
+  });
+}
+
+// How to play online modal handlers
+if (howToPlayOnlineBtn && howToPlayOnlineModal && closeHowToPlayOnlineBtn) {
+  howToPlayOnlineBtn.addEventListener('click', () => {
+    howToPlayOnlineModal.classList.add('show');
+  });
+
+  closeHowToPlayOnlineBtn.addEventListener('click', () => {
+    howToPlayOnlineModal.classList.remove('show');
+  });
+
+  howToPlayOnlineModal.addEventListener('click', (e) => {
+    if (e.target === howToPlayOnlineModal) {
+      howToPlayOnlineModal.classList.remove('show');
     }
   });
 }

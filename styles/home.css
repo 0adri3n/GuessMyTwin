@@ -168,6 +168,23 @@ body {
   border-color: #667eea;
 }
 
+/* small inline link/button under inputs */
+.small-link {
+  margin-top: 8px;
+}
+.link-btn {
+  background: none;
+  border: none;
+  color: #667eea;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.95rem;
+}
+.link-btn:hover {
+  color: #764ba2;
+}
+
 .actions {
   display: flex;
   flex-direction: column;
