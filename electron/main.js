@@ -246,19 +246,33 @@ ipcMain.on('create-mod', async (event) => {
     }
     
     const characters = [];
-    
+
     for (let i = 0; i < result.filePaths.length; i++) {
       const imagePath = result.filePaths[i];
-      const ext = path.extname(imagePath);
-      const newFileName = `character_${i + 1}${ext}`;
-      const destPath = path.join(modDir, newFileName);
-      
+      const originalBase = path.basename(imagePath); // keep original filename
+      const parsed = path.parse(originalBase);
+      const ext = parsed.ext;
+      let candidateName = originalBase;
+      let destPath = path.join(modDir, candidateName);
+
+      // Resolve name collisions by appending a numeric suffix
+      let counter = 1;
+      while (fs.existsSync(destPath)) {
+        candidateName = `${parsed.name}_${counter}${ext}`;
+        destPath = path.join(modDir, candidateName);
+        counter++;
+      }
+
       fs.copyFileSync(imagePath, destPath);
-      
+
+      // Character name: filename without extension, capitalize first letter
+      const rawName = path.parse(candidateName).name;
+      const charName = rawName.length > 0 ? rawName.charAt(0).toUpperCase() + rawName.slice(1) : `Character ${i + 1}`;
+
       characters.push({
         id: 100 + i + 1,
-        name: `Character ${i + 1}`,
-        image: newFileName
+        name: charName,
+        image: candidateName
       });
     }
     

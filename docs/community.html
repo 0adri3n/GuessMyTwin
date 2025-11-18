@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Mods - Guess My Twin</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="logo.ico">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">Guess My Twin</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="community.html" class="nav-link active">Community</a>
+                <a href="https://github.com/0adri3n/GuessMyTwin" target="_blank" class="nav-link">GitHub</a>
+            </div>
+            <button class="theme-toggle" id="themeToggle">
+                <span class="theme-icon">◐</span>
+            </button>
+        </div>
+    </nav>
+
+    <main>
+        <section class="community-hero">
+            <div class="community-hero-content">
+                <h1 class="hero-title">Community Mods</h1>
+                <p class="hero-description">
+                    Download custom character sets created by the community. 
+                    Extract the ZIP file and import it in-game to play with new characters.
+                </p>
+            </div>
+        </section>
+
+        <section class="mods-section">
+            <div class="mods-container">
+                <h2 class="section-title">Available Mods</h2>
+                
+                <div class="mods-grid" id="modsGrid">
+                    <!-- Mods will be populated by JavaScript -->
+                </div>
+
+                <div class="mods-empty" id="modsEmpty">
+                    <div class="empty-icon">📦</div>
+                    <h3>No mods available yet</h3>
+                    <p>Be the first to create and share a mod with the community!</p>
+                    <a href="https://github.com/0adri3n/GuessMyTwin#creating-mods" target="_blank" class="btn btn-primary">
+                        Learn How to Create Mods
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="mod-creation">
+            <div class="mod-creation-container">
+                <div class="mod-creation-content">
+                    <h2>Create Your Own Mod</h2>
+                    <p>
+                        Want to share your custom character set? It's easy! Create a folder with 
+                        your images and a JSON configuration file, then share it with the community.
+                    </p>
+                    <a href="https://github.com/0adri3n/GuessMyTwin#-creating-custom-mods" target="_blank" class="btn btn-secondary">
+                        View Documentation
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Guess My Twin</h4>
+                    <p>A modern take on the classic Guess Who game</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Links</h4>
+                    <a href="index.html">Home</a>
+                    <a href="community.html">Community</a>
+                    <a href="https://github.com/0adri3n/GuessMyTwin" target="_blank">GitHub</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <a href="https://github.com/0adri3n/GuessMyTwin#readme" target="_blank">Documentation</a>
+                    <a href="https://github.com/0adri3n/GuessMyTwin/issues" target="_blank">Report Issues</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Built with Electron, Socket.IO, and lots of fun</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

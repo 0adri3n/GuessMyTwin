@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess My Twin - Multiplayer Guess Who Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="logo.ico">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">Guess My Twin</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link active">Home</a>
+                <a href="community.html" class="nav-link">Community</a>
+                <a href="https://github.com/0adri3n/GuessMyTwin" target="_blank" class="nav-link">GitHub</a>
+            </div>
+            <button class="theme-toggle" id="themeToggle">
+                <span class="theme-icon">◐</span>
+            </button>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-badge">Built with Electron</div>
+                <h1 class="hero-title">The multiplayer Guess Who game for everyone</h1>
+                <p class="hero-description">
+                    Challenge your friends in the classic guessing game. Create custom character sets, 
+                    host local or remote games, and guess your opponent's character before they guess yours.
+                </p>
+                <div class="hero-buttons">
+                    <a href="https://github.com/0adri3n/GuessMyTwin/releases/latest" class="btn btn-primary" target="_blank">
+                        Download for Windows
+                    </a>
+                    <a href="https://github.com/0adri3n/GuessMyTwin" target="_blank" class="btn btn-secondary">
+                        View on GitHub
+                    </a>
+                </div>
+                <div class="hero-note">
+                    <span>Latest Version: 1.0.1</span>
+                </div>
+            </div>
+        </section>
+
+<section class="screenshots">
+            <div class="screenshots-container">
+                <h2 class="section-title">See it in action</h2>
+                <div class="carousel">
+                    <button class="carousel-btn carousel-prev" id="carouselPrev">‹</button>
+                    <div class="carousel-track-container">
+                        <div class="carousel-track" id="carouselTrack">
+                            <div class="carousel-slide">
+                                <img src="img/screen1.png" alt="Game Screenshot 1" class="carousel-image">
+                            </div>
+                            <div class="carousel-slide">
+                                <img src="img/screen2.png" alt="Game Screenshot 2" class="carousel-image">
+                            </div>
+                            <div class="carousel-slide">
+                                <img src="img/screen3.png" alt="Game Screenshot 3" class="carousel-image">
+                            </div>
+                        </div>
+                    </div>
+                    <button class="carousel-btn carousel-next" id="carouselNext">›</button>
+                </div>
+                <div class="carousel-indicators" id="carouselIndicators"></div>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="features-container">
+                <h2 class="section-title">What's in Guess My Twin?</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🎮</div>
+                        <h3 class="feature-title">Multiplayer Gaming</h3>
+                        <p class="feature-description">
+                            Host or join games locally or over the internet using ngrok tunneling. 
+                            Play with friends anywhere in the world.
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎨</div>
+                        <h3 class="feature-title">Custom Mods</h3>
+                        <p class="feature-description">
+                            Create and import custom character sets. Build your own mods with unique 
+                            characters and share them with the community.
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">👤</div>
+                        <h3 class="feature-title">Player Profiles</h3>
+                        <p class="feature-description">
+                            Customize your profile with a name and avatar. Show your personality 
+                            to your opponents during matches.
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌓</div>
+                        <h3 class="feature-title">Dark & Light Theme</h3>
+                        <p class="feature-description">
+                            Switch between dark and light modes to match your preference. 
+                            Easy on the eyes, day or night.
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3 class="feature-title">Real-time Gameplay</h3>
+                        <p class="feature-description">
+                            Powered by Socket.IO for instant communication between players. 
+                            Every action syncs in real-time.
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔧</div>
+                        <h3 class="feature-title">Easy Setup</h3>
+                        <p class="feature-description">
+                            Simple installation with no complex configuration. Download, 
+                            install, and start playing in minutes.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="how-it-works">
+            <div class="how-container">
+                <h2 class="section-title">How it works</h2>
+                <div class="steps-grid">
+                    <div class="step">
+                        <div class="step-number">01</div>
+                        <h3 class="step-title">Create or Join</h3>
+                        <p class="step-description">
+                            Host a game room or join a friend's room using their URL. 
+                            Set up your profile and choose a character set.
+                        </p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">02</div>
+                        <h3 class="step-title">Get Your Character</h3>
+                        <p class="step-description">
+                            Each player is secretly assigned a character. View all characters 
+                            in the grid and prepare your strategy.
+                        </p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">03</div>
+                        <h3 class="step-title">Eliminate & Guess</h3>
+                        <p class="step-description">
+                            Click characters to eliminate them. When you think you know your 
+                            opponent's character, hit the Guess button to win.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta">
+            <div class="cta-container">
+                <h2 class="cta-title">Ready to start guessing?</h2>
+                <p class="cta-description">
+                    Download Guess My Twin now and challenge your friends to the ultimate guessing game
+                </p>
+                <div class="cta-buttons">
+                    <a href="https://github.com/0adri3n/GuessMyTwin/releases/latest" class="btn btn-primary" target="_blank">
+                        Download Now
+                    </a>
+                    <a href="community.html" class="btn btn-secondary">
+                        Browse Community Mods
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Guess My Twin</h4>
+                    <p>A modern take on the classic Guess Who game</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Links</h4>
+                    <a href="index.html">Home</a>
+                    <a href="community.html">Community</a>
+                    <a href="https://github.com/0adri3n/GuessMyTwin" target="_blank">GitHub</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <a href="https://github.com/0adri3n/GuessMyTwin#readme" target="_blank">Documentation</a>
+                    <a href="https://github.com/0adri3n/GuessMyTwin/issues" target="_blank">Report Issues</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Built with Electron, Socket.IO, and lots of fun</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
