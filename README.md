@@ -103,6 +103,13 @@ npm run dev
 3. Name your mod
 4. It will automatically appear in the mod list
 
+**Tips :**
+
+*If you want to create mod easily, go to https://tiermaker.com, select a tierlist and then download the webpage by righ-clicking and select "Save as"
+
+This will save the HTML webpage with all medias included!
+*
+
 ---
 
 ### ✔️ Manual Mod Creation
