@@ -22,20 +22,20 @@ A multiplayer "Guess Who?" game built with Electron, featuring custom character 
 ### Setup
 
 1. Clone the repository:
-\`\`\`bash
+```bash
 git clone https://github.com/yourusername/guessmytwin.git
 cd guessmytwin
-\`\`\`
+```
 
 2. Install dependencies:
-\`\`\`bash
+```bash
 npm install
-\`\`\`
+```
 
 3. Start the application:
-\`\`\`bash
+```bash
 npm start
-\`\`\`
+```
 
 ## How to Play
 
@@ -77,16 +77,16 @@ npm start
 
 Create a folder with this structure:
 
-\`\`\`
+```
 my-custom-mod/
 ├── characters.json
 ├── character1.jpg
 ├── character2.jpg
 └── ...
-\`\`\`
+```
 
 **characters.json format:**
-\`\`\`json
+```json
 [
   {
     "id": 1,
@@ -99,7 +99,7 @@ my-custom-mod/
     "image": "character2.jpg"
   }
 ]
-\`\`\`
+```
 
 ### Importing Mods
 
@@ -112,18 +112,18 @@ my-custom-mod/
 ### Local Network
 
 The host's game runs on port 3000. Other players on the same network can join using:
-\`\`\`
+```
 http://[host-local-ip]:3000
-\`\`\`
+```
 
 ### Remote Play (via ngrok)
 
 1. Install [ngrok](https://ngrok.com/)
 2. Start your game (create a room)
 3. In a terminal, run:
-\`\`\`bash
+```bash
 ngrok http 3000
-\`\`\`
+```
 4. Share the ngrok URL (e.g., `https://abc123.ngrok.io`) with your friend
 5. They can enter this URL to join your game
 
