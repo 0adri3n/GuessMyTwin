@@ -53,12 +53,28 @@ yourCharacterDisplay.textContent = yourCharacter.name;
 yourCharacterImage.src = yourCharacter.image;
 yourCharacterName.textContent = yourCharacter.name;
 
+
+function setVsName(id, name) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  // Truncate to 20 chars, add ellipsis if needed
+  let displayName = name || '';
+  if (displayName.length > 20) displayName = displayName.slice(0, 20) + '…';
+  el.textContent = displayName;
+  // Use .small class if name is long (12+ chars)
+  if (displayName.length > 12) {
+    el.classList.add('small');
+  } else {
+    el.classList.remove('small');
+  }
+}
+
 const yourName = localStorage.getItem('playerName');
 const yourAvatar = localStorage.getItem('playerAvatar');
 const opponentName = opponentData.name || 'Opponent';
 const opponentAvatar = opponentData.avatar || null;
 
-document.getElementById('yourName').textContent = yourName || 'You';
+setVsName('yourName', yourName || 'You');
 if (yourAvatar) {
   const yourAvatarEl = document.getElementById('yourAvatar');
   const img = document.createElement('img');
@@ -69,7 +85,7 @@ if (yourAvatar) {
   yourAvatarEl.appendChild(img);
 }
 
-document.getElementById('opponentName').textContent = opponentName;
+setVsName('opponentName', opponentName);
 if (opponentAvatar) {
   const opponentAvatarEl = document.getElementById('opponentAvatar');
   const img = document.createElement('img');

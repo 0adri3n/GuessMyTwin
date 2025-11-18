@@ -447,7 +447,19 @@ body {
   font-weight: 700;
   color: var(--text-primary);
   font-size: 1rem;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  transition: font-size 0.2s;
 }
+
+.vs-name.small {
+  font-size: 0.8rem;
+  max-width: 90px;
+}
+
 
 .vs-divider {
   font-size: 2rem;
