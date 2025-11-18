@@ -413,6 +413,18 @@ ipcMain.on('load-profile', (event) => {
   }
 });
 
+// Expose helper to convert an image path to a data URI for renderers
+ipcMain.handle('to-data-uri', async (event, imagePath) => {
+  try {
+    const dataUri = imageToDataUri(imagePath);
+    console.log('[gmt] to-data-uri: input length=', (imagePath || '').length, '-> dataURI length=', (dataUri || '').length);
+    return dataUri;
+  } catch (err) {
+    console.error('[gmt] to-data-uri error:', err);
+    return '';
+  }
+});
+
 function startServerAsHost(playerName, playerAvatar) {
   const expressApp = express();
   httpServer = http.createServer(expressApp);

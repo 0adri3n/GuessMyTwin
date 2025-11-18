@@ -115,7 +115,7 @@ createModBtn.addEventListener('click', () => {
   ipcRenderer.send('create-mod');
 });
 
-createRoomBtn.addEventListener('click', () => {
+createRoomBtn.addEventListener('click', async () => {
   const playerName = playerNameInput.value.trim();
   
   if (!playerName) {
@@ -123,7 +123,18 @@ createRoomBtn.addEventListener('click', () => {
     return;
   }
 
-  const playerAvatar = currentProfile.avatar || null;
+  let playerAvatar = currentProfile.avatar || null;
+
+  // If avatar is a filesystem path (not a data URI), convert it via main process
+  try {
+    if (playerAvatar && typeof playerAvatar === 'string' && !playerAvatar.startsWith('data:')) {
+      playerAvatar = await ipcRenderer.invoke('to-data-uri', playerAvatar);
+      // update currentProfile with the converted data URI so subsequent actions use it
+      currentProfile.avatar = playerAvatar || currentProfile.avatar;
+    }
+  } catch (err) {
+    console.warn('[gmt] Failed to convert avatar to data URI on create-room:', err);
+  }
 
   console.log('[gmt] Creating room as host...');
   ipcRenderer.send('create-room', { playerName, playerAvatar });
@@ -138,7 +149,7 @@ ipcRenderer.on('room-created', (event, data) => {
   window.location.href = 'lobby.html';
 });
 
-joinRoomBtn.addEventListener('click', () => {
+joinRoomBtn.addEventListener('click', async () => {
   const playerName = playerNameInput.value.trim();
   const url = serverUrlInput.value.trim();
   
@@ -153,7 +164,17 @@ joinRoomBtn.addEventListener('click', () => {
   }
   
   console.log('[gmt] Joining room as guest...');
-  const playerAvatar = currentProfile.avatar || null;
+  let playerAvatar = currentProfile.avatar || null;
+
+  try {
+    if (playerAvatar && typeof playerAvatar === 'string' && !playerAvatar.startsWith('data:')) {
+      playerAvatar = await ipcRenderer.invoke('to-data-uri', playerAvatar);
+      currentProfile.avatar = playerAvatar || currentProfile.avatar;
+    }
+  } catch (err) {
+    console.warn('[gmt] Failed to convert avatar to data URI on join-room:', err);
+  }
+
   ipcRenderer.send('join-room', { playerName, serverUrl: url, playerAvatar });
 });
 
