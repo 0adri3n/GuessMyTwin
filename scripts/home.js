@@ -8,6 +8,7 @@ const playerNameInput = document.getElementById('playerName');
 const serverUrlInput = document.getElementById('serverUrl');
 const createRoomBtn = document.getElementById('createRoomBtn');
 const joinRoomBtn = document.getElementById('joinRoomBtn');
+const createModBtn = document.getElementById('createModBtn');
 const errorMessage = document.getElementById('errorMessage');
 const themeToggle = document.getElementById('themeToggle');
 
@@ -31,6 +32,11 @@ themeToggle.addEventListener('click', () => {
 });
 
 initTheme();
+
+createModBtn.addEventListener('click', () => {
+  console.log('[v0] Opening mod creator...');
+  ipcRenderer.send('create-mod');
+});
 
 createRoomBtn.addEventListener('click', () => {
   const playerName = playerNameInput.value.trim();

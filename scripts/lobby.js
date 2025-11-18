@@ -9,8 +9,13 @@ const guestWaiting = document.getElementById('guestWaiting');
 const startGameBtn = document.getElementById('startGameBtn');
 const waitingMessage = document.getElementById('waitingMessage');
 const themeToggle = document.getElementById('themeToggle');
+const importModBtn = document.getElementById('importModBtn');
+const customModInfo = document.getElementById('customModInfo');
+const customModName = document.getElementById('customModName');
 
 let players = [];
+let customMod = null;
+
 
 function initTheme() {
   const savedTheme = localStorage.getItem('theme') || 'light';
@@ -67,6 +72,24 @@ if (!isHost) {
   console.log('[v0] Host: Waiting for guest to join...');
 }
 
+importModBtn.addEventListener('click', () => {
+  if (!isHost) return;
+  console.log('[v0] Importing mod...');
+  ipcRenderer.send('import-mod');
+});
+
+ipcRenderer.on('mod-imported', (event, data) => {
+  console.log('[v0] Mod imported successfully:', data.modName);
+  customMod = data;
+  customModInfo.style.display = 'flex';
+  customModName.textContent = data.modName;
+});
+
+ipcRenderer.on('mod-import-error', (event, data) => {
+  console.log('[v0] Mod import error:', data.message);
+  alert(data.message);
+});
+
 ipcRenderer.on('player-joined', (event, data) => {
   console.log('[v0] Player joined, current players:', data.players.length);
   players = data.players;
@@ -117,9 +140,20 @@ function updatePlayersList() {
 startGameBtn.addEventListener('click', () => {
   if (!isHost) return;
   
-  const selectedMode = document.querySelector('input[name="mode"]:checked').value;
-  console.log('[v0] Host: Starting game with mode:', selectedMode);
-  ipcRenderer.send('start-game', { mode: selectedMode });
+  let selectedMode;
+  let characters;
+  
+  if (customMod) {
+    selectedMode = 'custom';
+    characters = customMod.characters;
+    console.log('[v0] Host: Starting game with custom mod:', customMod.modName);
+    ipcRenderer.send('start-game', { mode: selectedMode, customCharacters: characters });
+  } else {
+    selectedMode = document.querySelector('input[name="mode"]:checked').value;
+    console.log('[v0] Host: Starting game with mode:', selectedMode);
+    ipcRenderer.send('start-game', { mode: selectedMode });
+  }
+
 });
 
 ipcRenderer.on('game-started', (event, data) => {

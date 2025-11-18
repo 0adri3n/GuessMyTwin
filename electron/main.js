@@ -1,5 +1,6 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -60,7 +61,7 @@ ipcMain.on('start-game', (event, data) => {
   
   gameRoom.mode = data.mode;
   
-  const characters = getCharactersByMode(data.mode);
+  const characters = data.customCharacters || getCharactersByMode(data.mode);
   const player1Character = characters[Math.floor(Math.random() * characters.length)];
   const player2Character = characters[Math.floor(Math.random() * characters.length)];
   
@@ -112,6 +113,127 @@ ipcMain.on('get-room-info', (event) => {
   } else if (clientSocket) {
     // GUEST mode
     clientSocket.emit('room-info', event);
+  }
+});
+
+ipcMain.on('create-mod', async (event) => {
+  console.log('[v0] IPC: Create mod request');
+  
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openFile', 'multiSelections'],
+    filters: [
+      { name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'gif', 'webp'] }
+    ]
+  });
+  
+  if (result.canceled || result.filePaths.length === 0) {
+    console.log('[v0] Mod creation canceled');
+    return;
+  }
+  
+  const modNameResult = await dialog.showSaveDialog(mainWindow, {
+    title: 'Save Mod As',
+    defaultPath: 'my-mod',
+    properties: ['createDirectory']
+  });
+  
+  if (modNameResult.canceled) {
+    console.log('[v0] Mod creation canceled');
+    return;
+  }
+  
+  try {
+    const modDir = modNameResult.filePath;
+    const modName = path.basename(modDir);
+    
+    if (!fs.existsSync(modDir)) {
+      fs.mkdirSync(modDir, { recursive: true });
+    }
+    
+    const characters = [];
+    
+    for (let i = 0; i < result.filePaths.length; i++) {
+      const imagePath = result.filePaths[i];
+      const ext = path.extname(imagePath);
+      const newFileName = `character_${i + 1}${ext}`;
+      const destPath = path.join(modDir, newFileName);
+      
+      fs.copyFileSync(imagePath, destPath);
+      
+      characters.push({
+        id: 100 + i + 1,
+        name: `Character ${i + 1}`,
+        image: newFileName
+      });
+    }
+    
+    const modData = {
+      name: modName,
+      version: '1.0.0',
+      characters: characters
+    };
+    
+    fs.writeFileSync(
+      path.join(modDir, 'mod.json'),
+      JSON.stringify(modData, null, 2),
+      'utf8'
+    );
+    
+    console.log('[v0] Mod created successfully:', modName);
+    dialog.showMessageBox(mainWindow, {
+      type: 'info',
+      title: 'Success',
+      message: `Mod "${modName}" created successfully with ${characters.length} characters!`
+    });
+  } catch (error) {
+    console.error('[v0] Error creating mod:', error);
+    dialog.showErrorBox('Error', 'Failed to create mod: ' + error.message);
+  }
+});
+
+ipcMain.on('import-mod', async (event) => {
+  console.log('[v0] IPC: Import mod request');
+  
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openDirectory']
+  });
+  
+  if (result.canceled || result.filePaths.length === 0) {
+    console.log('[v0] Mod import canceled');
+    return;
+  }
+  
+  try {
+    const modDir = result.filePaths[0];
+    const modJsonPath = path.join(modDir, 'mod.json');
+    
+    if (!fs.existsSync(modJsonPath)) {
+      event.reply('mod-import-error', { message: 'No mod.json found in the selected folder' });
+      return;
+    }
+    
+    const modData = JSON.parse(fs.readFileSync(modJsonPath, 'utf8'));
+    
+    if (!modData.characters || !Array.isArray(modData.characters)) {
+      event.reply('mod-import-error', { message: 'Invalid mod.json format' });
+      return;
+    }
+    
+    const characters = modData.characters.map(char => ({
+      id: char.id,
+      name: char.name,
+      image: path.join(modDir, char.image)
+    }));
+    
+    event.reply('mod-imported', {
+      modName: modData.name || path.basename(modDir),
+      characters: characters
+    });
+    
+    console.log('[v0] Mod imported successfully:', modData.name);
+  } catch (error) {
+    console.error('[v0] Error importing mod:', error);
+    event.reply('mod-import-error', { message: 'Failed to import mod: ' + error.message });
   }
 });
 
@@ -301,7 +423,6 @@ function handleGuess(characterId, socketId) {
   }
 }
 
-const fs = require('fs');
 
 function imgToBase64(imagePath) {
   const absPath = path.join(__dirname, 'assets', imagePath);
