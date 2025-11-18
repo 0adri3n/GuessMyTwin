@@ -14,11 +14,9 @@
 
 - 🎭 **Local Multiplayer** – Host games on your LAN or expose them online via ngrok  
 - 🧩 **Custom Character Mods** – Create or import your own character packs  
-- 🧑‍🎨 **Built-In Character Sets** – Two polished default modes (Classic & Animals)  
 - 🧑‍🚀 **Player Profiles** – Personalize your name and avatar  
 - ⚡ **Real-Time Gameplay** – Fully synchronized guessing & eliminations  
 - 🌗 **Light & Dark Themes** – Saved automatically between sessions  
-- 🖥️ **Cross-Platform** – Windows, macOS, and Linux supported
 
 ---
 
