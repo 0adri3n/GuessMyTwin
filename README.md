@@ -245,6 +245,4 @@ MIT License – free for personal and commercial use.
 
 ## ❤️ Credits
 
-Developed with love using **Electron**, **Socket.IO**, and **vanilla JavaScript**.
-
-```
+Developed with love using **Electron**, **Socket.IO**, and **vanilla JavaScript**. by 0adri3n
