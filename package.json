@@ -1,6 +1,6 @@
 {
   "name": "guessmytwin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The famous \"Guess Who ?\" game designed on Windows to play against your real twin.",
   "main": "electron/main.js",
   "scripts": {
