@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="pages/src/logo.png" alt="GuessMyTwin Logo" width="200"/>
+  <img src="https://github.com/user-attachments/assets/08f4c8c5-f46e-46b6-93f3-97382ded85a3" alt="GuessMyTwin Logo" width="200"/>
 </p>
 
-<h1 align="center">GuessMyTwin 🎮</h1>
+<h1 align="center">GuessMyTwin</h1>
 
 <p align="center">
   A modern, moddable multiplayer “Guess Who?” game built with Electron and Socket.IO.
@@ -86,14 +86,12 @@ npm start
 
 ## 🖼️ Screenshots
 
-> *(Replace the paths with actual screenshots)*
-
 <p align="center">
-  <img src="screenshots/home.png" width="500"/>
+  <img src="https://github.com/user-attachments/assets/0f7726c8-e110-4471-a681-a4af217c0c46" width="800"/>
   <br/><br/>
-  <img src="screenshots/lobby.png" width="500"/>
+  <img src="https://github.com/user-attachments/assets/83f5ca16-8e9a-405a-aa22-24ff276e41ab" width="800"/>
   <br/><br/>
-  <img src="screenshots/game.png" width="500"/>
+  <img src="https://github.com/user-attachments/assets/216463c4-d7ff-4851-9ceb-69ac93283ff6" width="800"/>
 </p>
 
 ---
