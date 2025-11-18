@@ -4,7 +4,7 @@ const isHost = localStorage.getItem('isHost') === 'true';
 const gameData = JSON.parse(localStorage.getItem('gameData'));
 const opponentData = JSON.parse(localStorage.getItem('opponentData') || '{}');
 
-console.log('[v0] Loaded game data:', gameData);
+console.log('[gmt] Loaded game data:', gameData);
 const yourCharacter = gameData.yourCharacter;
 const characters = gameData.characters;
 
@@ -22,7 +22,7 @@ const themeToggle = document.getElementById('themeToggle');
 
 let eliminatedCharacters = new Set();
 let mySocketId = gameData.yourId; // Placeholder, will be set properly
-console.log('[v0] My socket ID:', mySocketId);
+console.log('[gmt] My socket ID:', mySocketId);
 
 function initTheme() {
   const savedTheme = localStorage.getItem('theme') || 'light';
@@ -45,8 +45,8 @@ themeToggle.addEventListener('click', () => {
 
 initTheme();
 
-console.log(`[v0] Game: Loaded as ${isHost ? 'HOST' : 'GUEST'}`);
-console.log(`[v0] Your character:`, yourCharacter.name);
+console.log(`[gmt] Game: Loaded as ${isHost ? 'HOST' : 'GUEST'}`);
+console.log(`[gmt] Your character:`, yourCharacter.name);
 
 
 yourCharacterDisplay.textContent = yourCharacter.name;
@@ -133,7 +133,7 @@ guessBtn.addEventListener('click', () => {
       `;
       
       card.addEventListener('click', () => {
-        console.log('[v0] Guessing character:', character.name);
+        console.log('[gmt] Guessing character:', character.name);
         ipcRenderer.send('guess-character', { 
           characterId: character.id,
           socketId: mySocketId 
@@ -151,7 +151,7 @@ cancelGuessBtn.addEventListener('click', () => {
 });
 
 ipcRenderer.on('guess-wrong', (event, data) => {
-  console.log('[v0] Wrong guess!');
+  console.log('[gmt] Wrong guess!');
   alert(data.message);
 });
 
@@ -160,7 +160,7 @@ ipcRenderer.on('game-over', (event, data) => {
   var opponent_character = isWinner ? data.opponent_character : data.guesser_character;
   var opponent_name = isWinner ? data.opponent_name : data.guesser_name;
 
-  console.log(`[v0] Game over! ${isWinner ? 'You won!' : 'You lost!'}`);
+  console.log(`[gmt] Game over! ${isWinner ? 'You won!' : 'You lost!'}`);
   
   document.getElementById('gameOverTitle').textContent = 
     isWinner ? '🎉 You Won!' : '😢 You Lost!';
@@ -172,12 +172,12 @@ ipcRenderer.on('game-over', (event, data) => {
   gameOverModal.classList.add('show');
 });
 backToHomeBtn.addEventListener('click', () => {
-  console.log('[v0] Going back to home, cleaning up...');
+  console.log('[gmt] Going back to home, cleaning up...');
   ipcRenderer.send('disconnect-socket');
   localStorage.clear();
 });
 
 ipcRenderer.on('socket-disconnected', () => {
-  console.log('[v0] Socket disconnected, redirecting to home...');
+  console.log('[gmt] Socket disconnected, redirecting to home...');
   window.location.href = 'home.html';
 });

@@ -53,7 +53,7 @@ themeToggle.addEventListener('click', () => {
 initTheme();
 
 window.addEventListener('load', () => {
-  console.log('[v0] Home page loaded, disconnecting any existing sockets...');
+  console.log('[gmt] Home page loaded, disconnecting any existing sockets...');
   ipcRenderer.send('disconnect-socket');
   // Load saved profile from disk
   ipcRenderer.send('load-profile');
@@ -107,7 +107,7 @@ saveProfileBtn.addEventListener('click', () => {
 });
 
 createModBtn.addEventListener('click', () => {
-  console.log('[v0] Opening mod creator...');
+  console.log('[gmt] Opening mod creator...');
   ipcRenderer.send('create-mod');
 });
 
@@ -121,12 +121,12 @@ createRoomBtn.addEventListener('click', () => {
 
   const playerAvatar = currentProfile.avatar || null;
 
-  console.log('[v0] Creating room as host...');
+  console.log('[gmt] Creating room as host...');
   ipcRenderer.send('create-room', { playerName, playerAvatar });
 });
 
 ipcRenderer.on('room-created', (event, data) => {
-  console.log('[v0] Room created successfully');
+  console.log('[gmt] Room created successfully');
   localStorage.setItem('playerName', data.playerName);
   localStorage.setItem('playerAvatar', data.playerAvatar || '');
   localStorage.setItem('serverUrl', 'http://localhost:3000');
@@ -148,13 +148,13 @@ joinRoomBtn.addEventListener('click', () => {
     return;
   }
   
-  console.log('[v0] Joining room as guest...');
+  console.log('[gmt] Joining room as guest...');
   const playerAvatar = currentProfile.avatar || null;
   ipcRenderer.send('join-room', { playerName, serverUrl: url, playerAvatar });
 });
 
 ipcRenderer.on('player-joined', (event, data) => {
-  console.log('[v0] Successfully joined room');
+  console.log('[gmt] Successfully joined room');
   localStorage.setItem('playerName', playerNameInput.value.trim());
   localStorage.setItem('playerAvatar', currentProfile.avatar || '');
   localStorage.setItem('serverUrl', serverUrlInput.value.trim());
@@ -178,15 +178,15 @@ ipcRenderer.on('profile-saved', (event, data) => {
   currentProfile = data || currentProfile;
   // reflect saved name in input
   if (currentProfile.name) playerNameInput.value = currentProfile.name;
-  console.log('[v0] Profile saved to disk');
+  console.log('[gmt] Profile saved to disk');
 });
 
 ipcRenderer.on('profile-load-error', (event, data) => {
-  console.error('[v0] Profile load error:', data.message);
+  console.error('[gmt] Profile load error:', data.message);
 });
 
 ipcRenderer.on('profile-save-error', (event, data) => {
-  console.error('[v0] Profile save error:', data.message);
+  console.error('[gmt] Profile save error:', data.message);
   alert('Error saving profile: ' + data.message);
 });
 

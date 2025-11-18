@@ -29,7 +29,7 @@ function loadSavedMods() {
       return JSON.parse(data);
     }
   } catch (error) {
-    console.error('[v0] Error loading saved mods:', error);
+    console.error('[gmt] Error loading saved mods:', error);
   }
   return [];
 }
@@ -37,9 +37,9 @@ function loadSavedMods() {
 function saveMods(mods) {
   try {
     fs.writeFileSync(SAVED_MODS_FILE, JSON.stringify(mods, null, 2), 'utf8');
-    console.log('[v0] Mods saved successfully');
+    console.log('[gmt] Mods saved successfully');
   } catch (error) {
-    console.error('[v0] Error saving mods:', error);
+    console.error('[gmt] Error saving mods:', error);
   }
 }
 
@@ -69,7 +69,7 @@ ipcMain.on('get-saved-mods', (event) => {
 
 
 ipcMain.on('create-room', (event, data) => {
-  console.log('[v0] IPC: Create room request from', data.playerName);
+  console.log('[gmt] IPC: Create room request from', data.playerName);
   
   if (httpServer) {
     event.reply('room-created', { playerName: data.playerName, playerAvatar: data.playerAvatar });
@@ -83,16 +83,16 @@ ipcMain.on('create-room', (event, data) => {
 });
 
 ipcMain.on('join-room', (event, data) => {
-  console.log('[v0] IPC: Join room request from', data.playerName, 'to', data.serverUrl);
+  console.log('[gmt] IPC: Join room request from', data.playerName, 'to', data.serverUrl);
   
   connectAsGuest(data.serverUrl, data.playerName, data.playerAvatar, event);
 });
 
 ipcMain.on('disconnect-socket', (event) => {
-  console.log('[v0] IPC: Disconnect socket request');
+  console.log('[gmt] IPC: Disconnect socket request');
   
   if (io) {
-    console.log('[v0] Closing server...');
+    console.log('[gmt] Closing server...');
     io.close();
     io = null;
   }
@@ -103,7 +103,7 @@ ipcMain.on('disconnect-socket', (event) => {
   }
   
   if (clientSocket) {
-    console.log('[v0] Disconnecting client socket...');
+    console.log('[gmt] Disconnecting client socket...');
     clientSocket.disconnect();
     clientSocket = null;
   }
@@ -119,7 +119,7 @@ ipcMain.on('disconnect-socket', (event) => {
 });
 
 ipcMain.on('start-game', (event, data) => {
-  console.log('[v0] IPC: Start game request with mode', data.mode);
+  console.log('[gmt] IPC: Start game request with mode', data.mode);
   
   if (!io) return;
   
@@ -152,13 +152,13 @@ ipcMain.on('start-game', (event, data) => {
     opponent: { name: gameRoom.players[0].name, avatar: gameRoom.players[0].avatar }
   });
 
-  console.log('[v0] Current game state:', gameRoom);
+  console.log('[gmt] Current game state:', gameRoom);
 
-  console.log('[v0] Game started with mode', data.mode);
+  console.log('[gmt] Game started with mode', data.mode);
 });
 
 ipcMain.on('guess-character', (event, data) => {
-  console.log('[v0] IPC: Guess character request', data.characterId);
+  console.log('[gmt] IPC: Guess character request', data.characterId);
   
   if (io) {
     // HOST mode
@@ -170,7 +170,7 @@ ipcMain.on('guess-character', (event, data) => {
 });
 
 ipcMain.on('get-room-info', (event) => {
-  console.log('[v0] IPC: Get room info request');
+  console.log('[gmt] IPC: Get room info request');
   if (io) {
     // HOST mode
     event.reply('room-info', {
@@ -186,7 +186,7 @@ ipcMain.on('get-room-info', (event) => {
 });
 
 ipcMain.on('create-mod', async (event) => {
-  console.log('[v0] IPC: Create mod request');
+  console.log('[gmt] IPC: Create mod request');
   
   const result = await dialog.showOpenDialog(mainWindow, {
     properties: ['openFile', 'multiSelections'],
@@ -196,7 +196,7 @@ ipcMain.on('create-mod', async (event) => {
   });
   
   if (result.canceled || result.filePaths.length === 0) {
-    console.log('[v0] Mod creation canceled');
+    console.log('[gmt] Mod creation canceled');
     return;
   }
   
@@ -207,7 +207,7 @@ ipcMain.on('create-mod', async (event) => {
   });
   
   if (modNameResult.canceled) {
-    console.log('[v0] Mod creation canceled');
+    console.log('[gmt] Mod creation canceled');
     return;
   }
   
@@ -248,27 +248,27 @@ ipcMain.on('create-mod', async (event) => {
       'utf8'
     );
     
-    console.log('[v0] Mod created successfully:', modName);
+    console.log('[gmt] Mod created successfully:', modName);
     dialog.showMessageBox(mainWindow, {
       type: 'info',
       title: 'Success',
       message: `Mod "${modName}" created successfully with ${characters.length} characters!`
     });
   } catch (error) {
-    console.error('[v0] Error creating mod:', error);
+    console.error('[gmt] Error creating mod:', error);
     dialog.showErrorBox('Error', 'Failed to create mod: ' + error.message);
   }
 });
 
 ipcMain.on('import-mod', async (event) => {
-  console.log('[v0] IPC: Import mod request');
+  console.log('[gmt] IPC: Import mod request');
   
   const result = await dialog.showOpenDialog(mainWindow, {
     properties: ['openDirectory']
   });
   
   if (result.canceled || result.filePaths.length === 0) {
-    console.log('[v0] Mod import canceled');
+    console.log('[gmt] Mod import canceled');
     return;
   }
   
@@ -316,15 +316,15 @@ ipcMain.on('import-mod', async (event) => {
       characters: characters
     });
     
-    console.log('[v0] Mod imported successfully:', modData.name);
+    console.log('[gmt] Mod imported successfully:', modData.name);
   } catch (error) {
-    console.error('[v0] Error importing mod:', error);
+    console.error('[gmt] Error importing mod:', error);
     event.reply('mod-import-error', { message: 'Failed to import mod: ' + error.message });
   }
 });
 
 ipcMain.on('select-avatar', async (event) => {
-  console.log('[v0] IPC: Select avatar request');
+  console.log('[gmt] IPC: Select avatar request');
   
   const result = await dialog.showOpenDialog(mainWindow, {
     properties: ['openFile'],
@@ -334,7 +334,7 @@ ipcMain.on('select-avatar', async (event) => {
   });
   
   if (result.canceled || result.filePaths.length === 0) {
-    console.log('[v0] Avatar selection canceled');
+    console.log('[gmt] Avatar selection canceled');
     return;
   }
   
@@ -350,10 +350,10 @@ ipcMain.on('save-profile', (event, data) => {
       avatar: data.avatar || ''
     };
     fs.writeFileSync(PROFILE_FILE, JSON.stringify(profile, null, 2), 'utf8');
-    console.log('[v0] Profile saved to', PROFILE_FILE);
+    console.log('[gmt] Profile saved to', PROFILE_FILE);
     event.reply('profile-saved', profile);
   } catch (err) {
-    console.error('[v0] Error saving profile:', err);
+    console.error('[gmt] Error saving profile:', err);
     event.reply('profile-save-error', { message: err.message });
   }
 });
@@ -365,12 +365,12 @@ ipcMain.on('load-profile', (event) => {
       const raw = fs.readFileSync(PROFILE_FILE, 'utf8');
       const profile = JSON.parse(raw);
       event.reply('profile-loaded', profile);
-      console.log('[v0] Profile loaded from', PROFILE_FILE);
+      console.log('[gmt] Profile loaded from', PROFILE_FILE);
     } else {
       event.reply('profile-loaded', { name: '', avatar: '' });
     }
   } catch (err) {
-    console.error('[v0] Error loading profile:', err);
+    console.error('[gmt] Error loading profile:', err);
     event.reply('profile-load-error', { message: err.message });
   }
 });
@@ -389,13 +389,13 @@ function startServerAsHost(playerName, playerAvatar) {
   expressApp.use(express.static('public'));
 
   io.on('connection', (socket) => {
-    console.log('[v0] HOST: Player connected:', socket.id);
+    console.log('[gmt] HOST: Player connected:', socket.id);
 
     // First connection is always the host
     if (gameRoom.players.length === 0) {
       gameRoom.host = socket.id;
       gameRoom.players = [{ id: socket.id, name: playerName, avatar: playerAvatar,ready: false }];
-      console.log('[v0] HOST: Host player added to room');
+      console.log('[gmt] HOST: Host player added to room');
       
       // Notify renderer process
       mainWindow.webContents.send('player-joined', { players: gameRoom.players });
@@ -414,7 +414,7 @@ function startServerAsHost(playerName, playerAvatar) {
         // Notify renderer process
         mainWindow.webContents.send('player-joined', { players: gameRoom.players });
         
-        console.log('[v0] HOST: Guest joined the room');
+        console.log('[gmt] HOST: Guest joined the room');
       });
     }
 
@@ -432,7 +432,7 @@ function startServerAsHost(playerName, playerAvatar) {
     });
 
     socket.on('disconnect', () => {
-      console.log('[v0] HOST: Player disconnected:', socket.id);
+      console.log('[gmt] HOST: Player disconnected:', socket.id);
       
       const playerIndex = gameRoom.players.findIndex(p => p.id === socket.id);
       if (playerIndex !== -1) {
@@ -455,7 +455,7 @@ function startServerAsHost(playerName, playerAvatar) {
 
   const PORT = 3000;
   httpServer.listen(PORT, () => {
-    console.log('[v0] HOST: Server started on port', PORT);
+    console.log('[gmt] HOST: Server started on port', PORT);
   });
 
 
@@ -466,30 +466,30 @@ function connectAsGuest(serverUrl, playerName, playerAvatar, event) {
   clientSocket = io(serverUrl);
   
   clientSocket.on('connect', () => {
-    console.log('[v0] GUEST: Connected to server');
+    console.log('[gmt] GUEST: Connected to server');
     clientSocket.emit('join-room', { playerName, playerAvatar });
   });
   
   clientSocket.on('connect_error', (error) => {
-    console.log('[v0] GUEST: Connection error', error);
+    console.log('[gmt] GUEST: Connection error', error);
     event.reply('join-error', { message: 'Cannot connect to server' });
   });
 
   // Notify renderer if the socket disconnects (server/host closed)
   clientSocket.on('disconnect', (reason) => {
-    console.log('[v0] GUEST: Disconnected from server, reason:', reason);
+    console.log('[gmt] GUEST: Disconnected from server, reason:', reason);
     try {
       if (mainWindow && mainWindow.webContents) {
         mainWindow.webContents.send('socket-disconnected', { reason });
       }
     } catch (err) {
-      console.error('[v0] Error sending socket-disconnected to renderer:', err);
+      console.error('[gmt] Error sending socket-disconnected to renderer:', err);
     }
   });
 
   clientSocket.on('room-info', (data) => {
-    console.log('[v0] GUEST: Room info received');
-    console.log('[v0] Current game room state:', data);
+    console.log('[gmt] GUEST: Room info received');
+    console.log('[gmt] Current game room state:', data);
     mainWindow.webContents.send('room-info', {
       host: data.host,
       players: data.players,
@@ -499,33 +499,33 @@ function connectAsGuest(serverUrl, playerName, playerAvatar, event) {
   });
   
   clientSocket.on('player-joined-event', (data) => {
-    console.log('[v0] GUEST: Player joined event received');
+    console.log('[gmt] GUEST: Player joined event received');
     event.reply('player-joined', { players: data.players });
     mainWindow.webContents.send('player-joined', { players: data.players });
   });
   
   clientSocket.on('player-left-event', (data) => {
-    console.log('[v0] GUEST: Player left event received');
+    console.log('[gmt] GUEST: Player left event received');
     mainWindow.webContents.send('player-left', { players: data.players });
   });
   
   clientSocket.on('game-started', (data) => {
-    console.log('[v0] GUEST: Game started event received');
+    console.log('[gmt] GUEST: Game started event received');
     mainWindow.webContents.send('game-started', data);
   });
   
   clientSocket.on('guess-wrong', (data) => {
-    console.log('[v0] GUEST: Wrong guess');
+    console.log('[gmt] GUEST: Wrong guess');
     mainWindow.webContents.send('guess-wrong', data);
   });
   
   clientSocket.on('game-over', (data) => {
-    console.log('[v0] GUEST: Game over');
+    console.log('[gmt] GUEST: Game over');
     mainWindow.webContents.send('game-over', data);
   });
   
   clientSocket.on('error', (data) => {
-    console.log('[v0] GUEST: Error', data.message);
+    console.log('[gmt] GUEST: Error', data.message);
     event.reply('join-error', data);
   });
 }
@@ -550,8 +550,8 @@ function handleGuess(characterId, socketId) {
   console.log(guesser)
   console.log(opponent)
 
-  console.log(`[v0] HOST: Player ${socketId} guessed character ID ${characterId}`);
-  console.log(`[v0] HOST: Opponent's character ID is ${opponent.character.name} (ID: ${opponent.character.id})`);
+  console.log(`[gmt] HOST: Player ${socketId} guessed character ID ${characterId}`);
+  console.log(`[gmt] HOST: Opponent's character ID is ${opponent.character.name} (ID: ${opponent.character.id})`);
 
   const isCorrect = characterId === opponent.character.id;
 
