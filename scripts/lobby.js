@@ -206,3 +206,18 @@ ipcRenderer.on('game-started', (event, data) => {
   localStorage.setItem('opponentData', JSON.stringify(data.opponent || {}));
   window.location.href = 'game.html';
 });
+
+// If the socket to the host/server is disconnected unexpectedly,
+// redirect the remaining player back to the home screen.
+ipcRenderer.on('socket-disconnected', (event, data) => {
+  console.log('[v0] Socket disconnected event received in lobby:', data);
+  if (!isHost) {
+    alert('Connection to the host/server was lost. Returning to home.');
+    // clear session values and go to home
+    localStorage.removeItem('playerName');
+    localStorage.removeItem('playerAvatar');
+    localStorage.removeItem('serverUrl');
+    localStorage.removeItem('isHost');
+    window.location.href = 'home.html';
+  }
+});

@@ -474,6 +474,18 @@ function connectAsGuest(serverUrl, playerName, playerAvatar, event) {
     event.reply('join-error', { message: 'Cannot connect to server' });
   });
 
+  // Notify renderer if the socket disconnects (server/host closed)
+  clientSocket.on('disconnect', (reason) => {
+    console.log('[v0] GUEST: Disconnected from server, reason:', reason);
+    try {
+      if (mainWindow && mainWindow.webContents) {
+        mainWindow.webContents.send('socket-disconnected', { reason });
+      }
+    } catch (err) {
+      console.error('[v0] Error sending socket-disconnected to renderer:', err);
+    }
+  });
+
   clientSocket.on('room-info', (data) => {
     console.log('[v0] GUEST: Room info received');
     console.log('[v0] Current game room state:', data);
