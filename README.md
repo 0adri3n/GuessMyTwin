@@ -103,12 +103,12 @@ npm run dev
 3. Name your mod
 4. It will automatically appear in the mod list
 
-**Tips :**
+### Tips :
 
-*If you want to create mod easily, go to https://tiermaker.com, select a tierlist and then download the webpage by righ-clicking and select "Save as"
+*If you want to create mod easily, go to https://tiermaker.com, select a tierlist and then download the webpage by righ-clicking and select "Save as"*
 
-This will save the HTML webpage with all medias included!
-*
+**This will save the HTML webpage with all medias included!**
+
 
 ---
 
@@ -127,18 +127,23 @@ my-custom-mod/
 `mod.json` format:
 
 ```json
-[
-  {
-    "id": 1,
-    "name": "Character 1",
-    "image": "character1.jpg"
-  },
-  {
-    "id": 2,
-    "name": "Character 2",
-    "image": "character2.png"
-  }
-]
+{
+  "name": "modTest",
+  "version": "1.0.0",
+  "characters": [
+    {
+      "id": 101,
+      "name": "Character 1",
+      "image": "character_1.png"
+    },
+    {
+      "id": 102,
+      "name": "Character 2",
+      "image": "character_2.png"
+    },
+    ...,
+    ]
+}
 ```
 
 ### ✔️ Importing Mods
