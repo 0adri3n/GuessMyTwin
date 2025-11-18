@@ -23,6 +23,11 @@ const uploadAvatarBtn = document.getElementById('uploadAvatarBtn');
 const saveProfileBtn = document.getElementById('saveProfileBtn');
 const cancelProfileBtn = document.getElementById('cancelProfileBtn');
 
+const howToPlayBtn = document.getElementById('howToPlayBtn');
+const howToPlayModal = document.getElementById('howToPlayModal');
+const closeHowToPlayBtn = document.getElementById('closeHowToPlayBtn');
+
+
 function initTheme() {
   const savedTheme = localStorage.getItem('theme') || 'light';
   document.documentElement.setAttribute('data-theme', savedTheme);
@@ -194,3 +199,17 @@ function showError(message) {
     errorMessage.classList.remove('show');
   }, 3000);
 }
+
+howToPlayBtn.addEventListener('click', () => {
+  howToPlayModal.classList.add('show');
+});
+
+closeHowToPlayBtn.addEventListener('click', () => {
+  howToPlayModal.classList.remove('show');
+});
+
+howToPlayModal.addEventListener('click', (e) => {
+  if (e.target === howToPlayModal) {
+    howToPlayModal.classList.remove('show');
+  }
+});

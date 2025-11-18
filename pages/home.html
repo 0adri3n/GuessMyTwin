@@ -7,25 +7,28 @@
   <link rel="stylesheet" href="../styles/home.css">
 </head>
 <body>
-  <!-- Added profile settings button -->
   <button class="profile-btn" id="profileBtn" aria-label="Profile settings">
     <span>⚙️</span>
   </button>
-
+  <button class="htp-btn" aria-label="How to play ?">
+    <span class="btn-icon" id="howToPlayBtn">❓</span>
+  </button>
   <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
     <span class="theme-icon">🌙</span>
   </button>
 
   <div class="container">
     <div class="header">
-      <h1 class="title">GuessMyTwin</h1>
-      <!-- Changed subtitle to English -->
+      <!-- Added logo to the left of the title -->
+      <div class="title-with-logo">
+        <img src="img/logo.png" alt="GuessMyTwin Logo" class="logo" id="logo" query="GuessMyTwin logo icon">
+        <h1 class="title">GuessMyTwin</h1>
+      </div>
       <p class="subtitle">The multiplayer Guess Who game</p>
     </div>
 
     <div class="content">
       <div class="card">
-        <!-- Updated all text to English -->
         <h2>Welcome!</h2>
         
         <div class="form-group">
@@ -39,17 +42,10 @@
             Create a room
           </button>
           
-          <!-- Added Create Mod button -->
-          <button class="btn btn-secondary" id="createModBtn">
-            <span class="btn-icon">📦</span>
-            Create a Mod
-          </button>
-          
           <div class="divider">
             <span>OR</span>
           </div>
           
-          <!-- Changed from room code to server URL input -->
           <div class="form-group">
             <label for="serverUrl">Server URL</label>
             <input type="text" id="serverUrl" placeholder="Ex: http://your-ngrok-url.ngrok.io">
@@ -61,22 +57,25 @@
           </button>
         </div>
 
+        <div class="divider">
+          <span>Mods</span>
+        </div>
+
+        <div class="actions">
+
+          <button class="btn btn-secondary" id="createModBtn">
+            <span class="btn-icon">📦</span>
+            Create a Mod
+          </button>
+
+        </div>
+
         <div class="error-message" id="errorMessage"></div>
       </div>
 
-      <div class="info">
-        <h3>How to play?</h3>
-        <ol>
-          <li>Create a room or join an existing room via URL</li>
-          <li>Wait for a second player to join</li>
-          <li>The host chooses the character set and starts the game</li>
-          <li>Guess your opponent's character!</li>
-        </ol>
-      </div>
     </div>
   </div>
 
-  <!-- Added profile modal -->
   <div class="profile-modal" id="profileModal">
     <div class="profile-modal-content">
       <h2>Profile Settings</h2>
@@ -97,6 +96,22 @@
         <button class="btn btn-save-profile" id="saveProfileBtn">Save</button>
         <button class="btn btn-cancel-profile" id="cancelProfileBtn">Cancel</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Added How to Play popup modal -->
+  <div class="how-to-play-modal" id="howToPlayModal">
+    <div class="how-to-play-modal-content">
+      <div class="modal-header">
+        <h2>How to play?</h2>
+        <button class="close-modal" id="closeHowToPlayBtn">&times;</button>
+      </div>
+      <ol>
+        <li>Create a room or join an existing room via URL</li>
+        <li>Wait for a second player to join</li>
+        <li>The host chooses the character set and starts the game</li>
+        <li>Guess your opponent's character!</li>
+      </ol>
     </div>
   </div>
 
