@@ -111,13 +111,13 @@ File structure:
 
 ```
 my-custom-mod/
-├── characters.json
+├── mod.json
 ├── character1.jpg
 ├── character2.png
 └── ...
 ```
 
-`characters.json` format:
+`mod.json` format:
 
 ```json
 [
