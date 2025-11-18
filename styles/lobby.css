@@ -163,6 +163,31 @@ body {
   transform: translateY(-5px);
 }
 
+/* Added player avatar styles */
+.player-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid white;
+  margin: 0 auto 10px;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.player-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.player-card.empty .player-avatar {
+  border-color: var(--empty-card-border);
+}
+
 .player-icon {
   font-size: 2.5rem;
   margin-bottom: 10px;
@@ -256,6 +281,7 @@ body {
   border-radius: 10px;
   background: var(--mode-card-bg);
   color: var(--text-primary);
+  /* Changed to Segoe UI font */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 0.95rem;
   cursor: pointer;
@@ -275,7 +301,7 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Consolas', 'Courier New', monospace;
 }
 
 .btn-load-mod:hover {
@@ -296,6 +322,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
+  /* Changed to Segoe UI font */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 

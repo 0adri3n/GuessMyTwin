@@ -18,6 +18,8 @@ let gameRoom = {
   gameState: null
 };
 
+const PROFILE_FILE = path.join(app.getPath('userData') || __dirname, 'profile.json');
+
 const SAVED_MODS_FILE = path.join(app.getPath('userData'), 'saved-mods.json');
 
 function loadSavedMods() {
@@ -69,19 +71,20 @@ ipcMain.on('create-room', (event, data) => {
   console.log('[v0] IPC: Create room request from', data.playerName);
   
   if (httpServer) {
-    event.reply('room-created', { playerName: data.playerName });
+    event.reply('room-created', { playerName: data.playerName, playerAvatar: data.playerAvatar });
     return;
   }
 
-  startServerAsHost(data.playerName);
-  connectAsGuest('http://localhost:3000', data.playerName, event);
-  event.reply('room-created', { playerName: data.playerName });
+  startServerAsHost(data.playerName, data.playerAvatar);
+  connectAsGuest('http://localhost:3000', data.playerName, data.playerAvatar, event);
+
+  event.reply('room-created', { playerName: data.playerName, playerAvatar: data.playerAvatar });
 });
 
 ipcMain.on('join-room', (event, data) => {
   console.log('[v0] IPC: Join room request from', data.playerName, 'to', data.serverUrl);
   
-  connectAsGuest(data.serverUrl, data.playerName, event);
+  connectAsGuest(data.serverUrl, data.playerName, data.playerAvatar, event);
 });
 
 ipcMain.on('disconnect-socket', (event) => {
@@ -134,13 +137,18 @@ ipcMain.on('start-game', (event, data) => {
   io.to(gameRoom.players[0].id).emit('game-started', {
     characters: characters,
     yourCharacter: player1Character,
-    yourId: gameRoom.players[0].id
+    yourId: gameRoom.players[0].id,
+    opponentId: gameRoom.players[1].id,
+    opponent: { name: gameRoom.players[1].name, avatar: gameRoom.players[1].avatar }
+
   });
 
   io.to(gameRoom.players[1].id).emit('game-started', {
     characters: characters,
     yourCharacter: player2Character,
-    yourId: gameRoom.players[1].id
+    yourId: gameRoom.players[1].id,
+    opponentId: gameRoom.players[0].id,
+    opponent: { name: gameRoom.players[0].name, avatar: gameRoom.players[0].avatar }
   });
 
   console.log('[v0] Current game state:', gameRoom);
@@ -314,7 +322,59 @@ ipcMain.on('import-mod', async (event) => {
   }
 });
 
-function startServerAsHost(playerName) {
+ipcMain.on('select-avatar', async (event) => {
+  console.log('[v0] IPC: Select avatar request');
+  
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openFile'],
+    filters: [
+      { name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'gif', 'webp'] }
+    ]
+  });
+  
+  if (result.canceled || result.filePaths.length === 0) {
+    console.log('[v0] Avatar selection canceled');
+    return;
+  }
+  
+  const avatarPath = result.filePaths[0];
+  event.reply('avatar-selected', { avatarPath });
+});
+
+// Save profile to a JSON file in userData
+ipcMain.on('save-profile', (event, data) => {
+  try {
+    const profile = {
+      name: data.name || '',
+      avatar: data.avatar || ''
+    };
+    fs.writeFileSync(PROFILE_FILE, JSON.stringify(profile, null, 2), 'utf8');
+    console.log('[v0] Profile saved to', PROFILE_FILE);
+    event.reply('profile-saved', profile);
+  } catch (err) {
+    console.error('[v0] Error saving profile:', err);
+    event.reply('profile-save-error', { message: err.message });
+  }
+});
+
+// Load profile from JSON file
+ipcMain.on('load-profile', (event) => {
+  try {
+    if (fs.existsSync(PROFILE_FILE)) {
+      const raw = fs.readFileSync(PROFILE_FILE, 'utf8');
+      const profile = JSON.parse(raw);
+      event.reply('profile-loaded', profile);
+      console.log('[v0] Profile loaded from', PROFILE_FILE);
+    } else {
+      event.reply('profile-loaded', { name: '', avatar: '' });
+    }
+  } catch (err) {
+    console.error('[v0] Error loading profile:', err);
+    event.reply('profile-load-error', { message: err.message });
+  }
+});
+
+function startServerAsHost(playerName, playerAvatar) {
   const expressApp = express();
   httpServer = http.createServer(expressApp);
   io = new Server(httpServer, {
@@ -333,7 +393,7 @@ function startServerAsHost(playerName) {
     // First connection is always the host
     if (gameRoom.players.length === 0) {
       gameRoom.host = socket.id;
-      gameRoom.players = [{ id: socket.id, name: playerName, ready: false }];
+      gameRoom.players = [{ id: socket.id, name: playerName, avatar: playerAvatar,ready: false }];
       console.log('[v0] HOST: Host player added to room');
       
       // Notify renderer process
@@ -346,7 +406,7 @@ function startServerAsHost(playerName) {
           return;
         }
 
-        gameRoom.players.push({ id: socket.id, name: data.playerName, ready: false });
+        gameRoom.players.push({ id: socket.id, name: data.playerName, avatar: data.playerAvatar, ready: false });
         
         io.emit('player-joined-event', { players: gameRoom.players });
         
@@ -400,13 +460,13 @@ function startServerAsHost(playerName) {
 
 }
 
-function connectAsGuest(serverUrl, playerName, event) {
+function connectAsGuest(serverUrl, playerName, playerAvatar, event) {
   const io = require('socket.io-client');
   clientSocket = io(serverUrl);
   
   clientSocket.on('connect', () => {
     console.log('[v0] GUEST: Connected to server');
-    clientSocket.emit('join-room', { playerName });
+    clientSocket.emit('join-room', { playerName, playerAvatar });
   });
   
   clientSocket.on('connect_error', (error) => {

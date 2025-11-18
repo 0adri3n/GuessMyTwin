@@ -7,10 +7,11 @@
   <link rel="stylesheet" href="../styles/game.css">
 </head>
 <body>
-  <!-- Added theme toggle button -->
   <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
     <span class="theme-icon">🌙</span>
   </button>
+
+  <!-- VS interface moved into the sidebar (see below) -->
 
   <div class="container">
     <div class="header">
@@ -26,6 +27,18 @@
 
     <div class="game-content">
       <div class="sidebar">
+          <!-- VS interface: moved here so it's part of the sidebar layout -->
+          <div class="vs-interface" id="vsInterface">
+            <div class="vs-player">
+              <div class="vs-avatar" id="yourAvatar">👤</div>
+              <div class="vs-name" id="yourName">You</div>
+            </div>
+            <div class="vs-divider">VS</div>
+            <div class="vs-player">
+              <div class="vs-avatar" id="opponentAvatar">👤</div>
+              <div class="vs-name" id="opponentName">Opponent</div>
+            </div>
+          </div>
         <div class="your-character-card">
           <!-- Changed to English -->
           <h3>Your Character</h3>

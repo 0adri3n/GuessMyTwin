@@ -1,6 +1,7 @@
 const { ipcRenderer } = require('electron');
 
 const playerName = localStorage.getItem('playerName');
+const playerAvatar = localStorage.getItem('playerAvatar');
 const isHost = localStorage.getItem('isHost') === 'true';
 
 const playersList = document.getElementById('playersList');
@@ -160,14 +161,18 @@ function updatePlayersList() {
     
     if (players[i]) {
       playerCard.className = 'player-card';
+      const avatarHtml = players[i].avatar 
+      ? `<div class="player-avatar"><img src="${players[i].avatar}" alt="Avatar"></div>`
+      : `<div class="player-avatar"><div class="player-icon">🎮</div></div>`;
+      
       playerCard.innerHTML = `
-        <div class="player-icon">🎮</div>
+        ${avatarHtml}
         <div class="player-name">${players[i].name}</div>
       `;
     } else {
       playerCard.className = 'player-card empty';
       playerCard.innerHTML = `
-        <div class="player-icon">👤</div>
+        <div class="player-avatar"><div class="player-icon">👤</div></div>
         <div class="player-name">Waiting...</div>
       `;
     }
@@ -198,5 +203,6 @@ startGameBtn.addEventListener('click', () => {
 ipcRenderer.on('game-started', (event, data) => {
   console.log('[v0] Game started, redirecting to game page...');
   localStorage.setItem('gameData', JSON.stringify(data));
+  localStorage.setItem('opponentData', JSON.stringify(data.opponent || {}));
   window.location.href = 'game.html';
 });

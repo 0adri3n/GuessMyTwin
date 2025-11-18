@@ -2,6 +2,8 @@ const { ipcRenderer } = require('electron');
 
 const isHost = localStorage.getItem('isHost') === 'true';
 const gameData = JSON.parse(localStorage.getItem('gameData'));
+const opponentData = JSON.parse(localStorage.getItem('opponentData') || '{}');
+
 console.log('[v0] Loaded game data:', gameData);
 const yourCharacter = gameData.yourCharacter;
 const characters = gameData.characters;
@@ -50,6 +52,50 @@ console.log(`[v0] Your character:`, yourCharacter.name);
 yourCharacterDisplay.textContent = yourCharacter.name;
 yourCharacterImage.src = yourCharacter.image;
 yourCharacterName.textContent = yourCharacter.name;
+
+const yourName = localStorage.getItem('playerName');
+const yourAvatar = localStorage.getItem('playerAvatar');
+const opponentName = opponentData.name || 'Opponent';
+const opponentAvatar = opponentData.avatar || null;
+
+document.getElementById('yourName').textContent = yourName || 'You';
+if (yourAvatar) {
+  const yourAvatarEl = document.getElementById('yourAvatar');
+  const img = document.createElement('img');
+  img.src = yourAvatar;
+  img.alt = 'Your avatar';
+  img.className = 'avatar-img';
+  yourAvatarEl.innerHTML = '';
+  yourAvatarEl.appendChild(img);
+}
+
+document.getElementById('opponentName').textContent = opponentName;
+if (opponentAvatar) {
+  const opponentAvatarEl = document.getElementById('opponentAvatar');
+  const img = document.createElement('img');
+  img.src = opponentAvatar;
+  img.alt = 'Opponent avatar';
+  img.className = 'avatar-img';
+  opponentAvatarEl.innerHTML = '';
+  opponentAvatarEl.appendChild(img);
+}
+
+// Load persistent profile (if any) and update UI
+ipcRenderer.send('load-profile');
+ipcRenderer.on('profile-loaded', (event, data) => {
+  if (!data) return;
+  // const name = data.name || localStorage.getItem('playerName') || 'You';
+  // const avatar = data.avatar || localStorage.getItem('playerAvatar') || null;
+  // document.getElementById('yourName').textContent = name || 'You';
+  // if (avatar) {
+  //   const yourAvatarEl = document.getElementById('yourAvatar');
+  //   const img = document.createElement('img');
+  //   img.src = avatar;
+  //   img.alt = 'Your avatar';
+  //   yourAvatarEl.innerHTML = '';
+  //   yourAvatarEl.appendChild(img);
+  // }
+});
 
 characters.forEach(character => {
   const card = document.createElement('div');
