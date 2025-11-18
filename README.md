@@ -139,7 +139,7 @@ my-custom-mod/
 1. Open the lobby
 2. Click **Import Mod**
 3. Select your mod folder
-4. Your custom pack appears in the dropdown
+4. Your can now load it from lobby by selecting the created folder !
 
 ---
 
