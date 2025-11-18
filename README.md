@@ -1,91 +1,128 @@
-# GuessMyTwin 🎮
+<p align="center">
+  <img src="pages/src/logo.png" alt="GuessMyTwin Logo" width="200"/>
+</p>
 
-A multiplayer "Guess Who?" game built with Electron, featuring custom character mods and real-time gameplay over local networks.
+<h1 align="center">GuessMyTwin 🎮</h1>
 
-## Features
+<p align="center">
+  A modern, moddable multiplayer “Guess Who?” game built with Electron and Socket.IO.
+</p>
 
-- **Local Multiplayer**: Host a game and let others join via your network URL (using ngrok or similar tunneling)
-- **Custom Character Mods**: Create and import your own character sets with custom images
-- **Built-in Character Sets**: Two default modes (Classic and Animals) with 16 characters each
-- **Profile System**: Set your player name and avatar that persists across sessions
-- **Real-time Gameplay**: Eliminate characters and make guesses in real-time
-- **Dark/Light Theme**: Toggle between themes with persistent preferences
-- **Cross-Platform**: Works on Windows, macOS, and Linux
+---
 
-## Installation
+## 📌 Features
 
-### Prerequisites
+- 🎭 **Local Multiplayer** – Host games on your LAN or expose them online via ngrok  
+- 🧩 **Custom Character Mods** – Create or import your own character packs  
+- 🧑‍🎨 **Built-In Character Sets** – Two polished default modes (Classic & Animals)  
+- 🧑‍🚀 **Player Profiles** – Personalize your name and avatar  
+- ⚡ **Real-Time Gameplay** – Fully synchronized guessing & eliminations  
+- 🌗 **Light & Dark Themes** – Saved automatically between sessions  
+- 🖥️ **Cross-Platform** – Windows, macOS, and Linux supported
 
-- Node.js (v14 or higher)
-- npm or yarn
+---
 
-### Setup
+## 📥 Installation
 
-1. Clone the repository:
+### ✔️ Option 1 — Install with Windows Installer (Recommended)
+
+1. Go to the **[Latest Release](https://github.com/0adri3n/GuessMyTwin/releases/latest)**  
+2. Download the file:
+```
+
+GuessMyTwin-Setup.exe
+
+````
+3. Run the installer — the game will appear in your Start Menu 🎉
+
+---
+
+### ✔️ Option 2 — Run from Source
+
+#### Prerequisites
+- Node.js v14+  
+- npm or yarn  
+
+#### Setup
+
 ```bash
-git clone https://github.com/yourusername/guessmytwin.git
+git clone https://github.com/0adri3n/GuessMyTwin.git
 cd guessmytwin
-```
-
-2. Install dependencies:
-```bash
 npm install
-```
-
-3. Start the application:
-```bash
 npm start
-```
+````
 
-## How to Play
+---
 
-### Hosting a Game
+## 🎮 How to Play
 
-1. Launch the application
-2. (Optional) Configure your profile by clicking the settings icon
-3. Click **"Create Room"**
-4. Wait for another player to join
-5. Select a character mode (Classic, Animals, or a custom imported mod)
-6. Click **"Start Game"** when ready
-
-### Joining a Game
+### 🏠 Hosting a Game
 
 1. Launch the application
-2. (Optional) Configure your profile
-3. Enter the host's URL in the **"Join a Room"** field
-   - For local network: `http://[host-ip]:3000`
-   - For remote: Use ngrok or similar tunneling service
+2. Configure your profile (optional)
+3. Click **Create Room**
+4. Share the displayed URL with your opponent
+5. Once they join, choose a game mode
+6. Press **Start Game**
+
+### 🌍 Joining a Game
+
+1. Launch the app
+2. Configure your profile (optional)
+3. Enter the host’s URL in the **Join a Room** field
+
+   * Local play → `http://[host-ip]:3000`
+   * Online play → ngrok or other tunnels
 4. Wait for the host to start the game
 
-### Gameplay
+### 🕹️ Gameplay Rules
 
-- Click on character images to eliminate them (they become greyed out)
-- When you think you know your opponent's character, click **"Make a Guess"**
-- Select the character you think is your opponent's
-- First player to guess correctly wins!
+* Click characters to eliminate them
+* When ready, click **Make a Guess**
+* Choose the character you think is your opponent’s
+* First correct guess wins! 🎉
 
-## Creating Custom Mods
+---
 
-### Using the Mod Creator
+## 🖼️ Screenshots
 
-1. On the home screen, click **"Create a Mod"**
-2. Select multiple images (16 recommended for balanced gameplay)
-3. Enter a name for your mod
-4. The mod is automatically saved and can be imported in the lobby
+> *(Replace the paths with actual screenshots)*
 
-### Manual Mod Creation
+<p align="center">
+  <img src="screenshots/home.png" width="500"/>
+  <br/><br/>
+  <img src="screenshots/lobby.png" width="500"/>
+  <br/><br/>
+  <img src="screenshots/game.png" width="500"/>
+</p>
 
-Create a folder with this structure:
+---
+
+## 🧩 Creating Custom Mods
+
+### ✔️ Using the Built-In Mod Creator
+
+1. From the Home page, click **Create a Mod**
+2. Select your character images (16 recommended)
+3. Name your mod
+4. It will automatically appear in the mod list
+
+---
+
+### ✔️ Manual Mod Creation
+
+File structure:
 
 ```
 my-custom-mod/
 ├── characters.json
 ├── character1.jpg
-├── character2.jpg
+├── character2.png
 └── ...
 ```
 
-**characters.json format:**
+`characters.json` format:
+
 ```json
 [
   {
@@ -96,104 +133,122 @@ my-custom-mod/
   {
     "id": 2,
     "name": "Character 2",
-    "image": "character2.jpg"
+    "image": "character2.png"
   }
 ]
 ```
 
-### Importing Mods
+### ✔️ Importing Mods
 
-1. In the lobby, click **"Import Mod"**
-2. Select the folder containing your mod
-3. The mod appears in the dropdown for future games
+1. Open the lobby
+2. Click **Import Mod**
+3. Select your mod folder
+4. Your custom pack appears in the dropdown
 
-## Network Setup
+---
 
-### Local Network
+## 🌐 Network Setup
 
-The host's game runs on port 3000. Other players on the same network can join using:
+### 🛜 Local Network Play
+
+Host machine shares:
+
 ```
-http://[host-local-ip]:3000
+http://[local-ip]:3000
 ```
 
-### Remote Play (via ngrok)
+### 🌍 Online Play with Pinggy
 
-1. Install [ngrok](https://ngrok.com/)
-2. Start your game (create a room)
-3. In a terminal, run:
+1. Run:
+
 ```bash
-ngrok http 3000
+ssh -p 443 -R0:127.0.0.1:3000 qr@free.pinggy.io
 ```
-4. Share the ngrok URL (e.g., `https://abc123.ngrok.io`) with your friend
-5. They can enter this URL to join your game
 
-## Project Structure
+2. Share the HTTP/HTTPS URL provided by pinggy
+
+---
+
+## 📁 Project Structure
 
 ```
-guessmytwin/
-├── main.js              # Electron main process & Socket.IO server
-├── pages/               # HTML pages
-│   ├── home.html       # Main menu
-│   ├── lobby.html      # Waiting room
-│   └── game.html       # Game interface
-├── scripts/            # Client-side JavaScript
+guessmytwin/           
+│         
+├── pages/
+│   ├── home.html
+│   ├── lobby.html
+│   └── game.html
+├── scripts/
 │   ├── home.js
 │   ├── lobby.js
 │   └── game.js
-├── styles/             # CSS stylesheets
+├── styles/
 │   ├── home.css
 │   ├── lobby.css
 │   └── game.css
-└── assets/             # Character images and resources
-    ├── classic/
-    └── animals/
+└── electron/
+    ├── main.js     # Electron main process & Socket.IO server
+    └── preload.js  # Secure IPC bridge (useless)
 ```
 
-## Technologies Used
+---
 
-- **Electron**: Desktop application framework
-- **Socket.IO**: Real-time bidirectional communication
-- **Node.js**: Backend runtime
-- **HTML/CSS/JavaScript**: Frontend interface
-
-## Development
-
-### Running in Development
+## 🛠 Development
 
 ```bash
-npm start
+npm install
 ```
 
-### Building for Production
+### Run in Dev Mode
+
+```bash
+npm run dev
+```
+
+### Build Production Packages
 
 ```bash
 npm run build
 ```
 
-## Troubleshooting
+---
 
-**Issue**: Can't connect to host
-- Ensure both players are on the same network (for local play)
-- Check firewall settings allow connections on port 3000
-- Verify the host has actually created a room
+## ❗ Troubleshooting
 
-**Issue**: Game doesn't start after clicking "Start Game"
-- Make sure exactly 2 players are in the lobby
-- Try refreshing both clients and reconnecting
+### 🔌 Can't connect to host
 
-**Issue**: Characters not displaying
-- Check that image files exist in the mod folder
-- Verify the paths in characters.json are correct
-- Ensure image formats are supported (jpg, png, gif)
+* Ensure both devices are on the same network
+* Disable firewalls blocking port 3000
+* Confirm the host created a room
 
-## Contributing
+### 🎬 Game won’t start
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+* Exactly **2 players** must be in the lobby
+* Try restarting both clients
 
-## License
+### 🖼️ Characters not showing
 
-MIT License - feel free to use this project for personal or commercial purposes.
+* Check image paths in `characters.json`
+* Ensure supported formats: `.png`, `.jpg`, `.jpeg`, `.gif`
+* Mod folder must be structured correctly
 
-## Credits
+---
 
-Developed with ❤️ using Electron and Socket.IO
+## 🤝 Contributing
+
+Pull requests are welcome!
+Feel free to open issues, improve features, or add new mod tools.
+
+---
+
+## 📄 License
+
+MIT License – free for personal and commercial use.
+
+---
+
+## ❤️ Credits
+
+Developed with love using **Electron**, **Socket.IO**, and **vanilla JavaScript**.
+
+```
