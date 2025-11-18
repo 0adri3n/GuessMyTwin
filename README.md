@@ -59,7 +59,7 @@ npm run dev
 1. Launch the application
 2. Configure your profile (optional)
 3. Click **Create Room**
-4. Share the displayed URL with your opponent
+4. Share the URL with your opponent
 5. Once they join, choose a game mode
 6. Press **Start Game**
 
@@ -70,7 +70,7 @@ npm run dev
 3. Enter the host’s URL in the **Join a Room** field
 
    * Local play → `http://[host-ip]:3000`
-   * Online play → ngrok or other tunnels
+   * Online play → pinggy or other tunnels
 4. Wait for the host to start the game
 
 ### 🕹️ Gameplay Rules
