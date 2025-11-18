@@ -111,15 +111,17 @@ ipcRenderer.on('guess-wrong', (event, data) => {
 
 ipcRenderer.on('game-over', (event, data) => {
   const isWinner = data.winner === mySocketId;
-  
+  var opponent_character = isWinner ? data.guesser_character : data.opponent_character;
+  var opponent_name = isWinner ? data.guesser_name : data.opponent_name;
+
   console.log(`[v0] Game over! ${isWinner ? 'You won!' : 'You lost!'}`);
   
   document.getElementById('gameOverTitle').textContent = 
     isWinner ? '🎉 You Won!' : '😢 You Lost!';
   
-  document.getElementById('winnerCharacterImage').src = data.character.image;
+  document.getElementById('winnerCharacterImage').src = opponent_character.image;
   document.getElementById('winnerCharacterName').textContent = 
-    `The character was: ${data.character.name}`;
+    `${opponent_name} character was: ${opponent_character.name}`;
   
   gameOverModal.classList.add('show');
 });

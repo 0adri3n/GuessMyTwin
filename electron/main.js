@@ -67,8 +67,8 @@ ipcMain.on('start-game', (event, data) => {
   
   gameRoom.gameState = {
     characters: characters,
-    player1: { id: gameRoom.players[0].id, character: player1Character },
-    player2: { id: gameRoom.players[1].id, character: player2Character }
+    player1: { id: gameRoom.players[0].id, name: gameRoom.players[0].name, character: player1Character },
+    player2: { id: gameRoom.players[1].id, name: gameRoom.players[1].name, character: player2Character }
   };
 
   io.to(gameRoom.players[0].id).emit('game-started', {
@@ -384,14 +384,17 @@ function handleGuess(characterId, socketId) {
   if (!gameRoom.gameState) return;
 
   var opponent;
+  var guesser_character
 
   console.log(socketId)
 
   if (gameRoom.gameState.player1.id === socketId) {
     opponent = gameRoom.gameState.player2;
+    guesser_character = gameRoom.gameState.player1;
   }
   else {
     opponent = gameRoom.gameState.player1;
+    guesser_character = gameRoom.gameState.player2;
   }
   
   const guesser = gameRoom.gameState.player1.id === socketId ? gameRoom.gameState.player1 : gameRoom.gameState.player2;
@@ -408,7 +411,8 @@ function handleGuess(characterId, socketId) {
   if (isCorrect) {
     const gameOverData = {
       winner: socketId,
-      character: opponent.character
+      guesser_character: guesser.character,
+      opponent_character: opponent.character
     };
     
     if (io) {
@@ -416,10 +420,18 @@ function handleGuess(characterId, socketId) {
     }
     mainWindow.webContents.send('game-over', gameOverData);
   } else {
+    const gameOverData = {
+      winner: opponent.id,
+      guesser_character: guesser.character,
+      guesser_name: guesser.name,
+      opponent_character: opponent.character,
+      opponent_name: opponent.name
+    };
+    
     if (io) {
-      io.to(socketId).emit('guess-wrong', { message: 'Wrong character!' });
+      io.emit('game-over', gameOverData);
     }
-    mainWindow.webContents.send('guess-wrong', { message: 'Wrong character!' });
+    mainWindow.webContents.send('game-over', gameOverData);
   }
 }
 
