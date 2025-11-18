@@ -25,7 +25,8 @@
     "win": {
       "target": [
         "nsis"
-      ]
+      ],
+      "icon": "pages/img/logo.ico"
     },
     "nsis": {
       "oneClick": false,
@@ -94,7 +95,6 @@
     "clsx": "^2.1.1",
     "cmdk": "1.0.4",
     "date-fns": "4.1.0",
-    "electron": "39.2.1",
     "embla-carousel-react": "8.5.1",
     "express": "5.1.0",
     "http": "0.0.1-security",
