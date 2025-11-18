@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="../styles/lobby.css">
 </head>
 <body>
-  <!-- Added theme toggle button -->
   <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
     <span class="theme-icon">🌙</span>
   </button>
@@ -15,7 +14,6 @@
   <div class="container">
     <div class="header">
       <h1 class="title">GuessMyTwin</h1>
-      <!-- Removed room code display, changed text to English -->
       <div class="room-info">
         <span class="room-label">Waiting for players...</span>
       </div>
@@ -23,7 +21,6 @@
 
     <div class="content">
       <div class="players-section">
-        <!-- Changed to English -->
         <h2>Players</h2>
         <div class="players-list" id="playersList">
           <div class="player-card empty">
@@ -38,7 +35,6 @@
       </div>
 
       <div class="settings-section" id="settingsSection">
-        <!-- Changed to English -->
         <h2>Game Settings</h2>
         
         <div class="mode-selection">
@@ -61,7 +57,17 @@
           </label>
         </div>
 
-        <!-- Added Import Mod button -->
+        <!-- Added saved mods dropdown -->
+        <div class="saved-mods-section">
+          <label for="savedModsSelect">Load Saved Mod:</label>
+          <div class="saved-mods-controls">
+            <select id="savedModsSelect" class="saved-mods-select">
+              <option value="">-- Select a saved mod --</option>
+            </select>
+            <button class="btn btn-load-mod" id="loadSavedModBtn">Load</button>
+          </div>
+        </div>
+
         <button class="btn btn-import" id="importModBtn">
           <span class="btn-icon">📁</span>
           Import Mod
@@ -82,7 +88,6 @@
       </div>
 
       <div class="guest-waiting" id="guestWaiting" style="display: none;">
-        <!-- Changed to English -->
         <h2>Waiting...</h2>
         <div class="spinner"></div>
         <p>The host will start the game soon</p>

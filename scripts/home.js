@@ -33,6 +33,11 @@ themeToggle.addEventListener('click', () => {
 
 initTheme();
 
+window.addEventListener('load', () => {
+  console.log('[v0] Home page loaded, disconnecting any existing sockets...');
+  ipcRenderer.send('disconnect-socket');
+});
+
 createModBtn.addEventListener('click', () => {
   console.log('[v0] Opening mod creator...');
   ipcRenderer.send('create-mod');

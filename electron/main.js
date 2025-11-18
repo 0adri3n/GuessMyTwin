@@ -18,6 +18,29 @@ let gameRoom = {
   gameState: null
 };
 
+const SAVED_MODS_FILE = path.join(app.getPath('userData'), 'saved-mods.json');
+
+function loadSavedMods() {
+  try {
+    if (fs.existsSync(SAVED_MODS_FILE)) {
+      const data = fs.readFileSync(SAVED_MODS_FILE, 'utf8');
+      return JSON.parse(data);
+    }
+  } catch (error) {
+    console.error('[v0] Error loading saved mods:', error);
+  }
+  return [];
+}
+
+function saveMods(mods) {
+  try {
+    fs.writeFileSync(SAVED_MODS_FILE, JSON.stringify(mods, null, 2), 'utf8');
+    console.log('[v0] Mods saved successfully');
+  } catch (error) {
+    console.error('[v0] Error saving mods:', error);
+  }
+}
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
@@ -34,6 +57,13 @@ function createWindow() {
   // mainWindow.webContents.openDevTools();
 
 }
+
+
+ipcMain.on('get-saved-mods', (event) => {
+  const savedMods = loadSavedMods();
+  event.reply('saved-mods-loaded', { mods: savedMods });
+});
+
 
 ipcMain.on('create-room', (event, data) => {
   console.log('[v0] IPC: Create room request from', data.playerName);
@@ -52,6 +82,36 @@ ipcMain.on('join-room', (event, data) => {
   console.log('[v0] IPC: Join room request from', data.playerName, 'to', data.serverUrl);
   
   connectAsGuest(data.serverUrl, data.playerName, event);
+});
+
+ipcMain.on('disconnect-socket', (event) => {
+  console.log('[v0] IPC: Disconnect socket request');
+  
+  if (io) {
+    console.log('[v0] Closing server...');
+    io.close();
+    io = null;
+  }
+  
+  if (httpServer) {
+    httpServer.close();
+    httpServer = null;
+  }
+  
+  if (clientSocket) {
+    console.log('[v0] Disconnecting client socket...');
+    clientSocket.disconnect();
+    clientSocket = null;
+  }
+  
+  gameRoom = {
+    host: null,
+    players: [],
+    mode: null,
+    gameState: null
+  };
+  
+  event.reply('socket-disconnected');
 });
 
 ipcMain.on('start-game', (event, data) => {
@@ -225,6 +285,23 @@ ipcMain.on('import-mod', async (event) => {
       image: path.join(modDir, char.image)
     }));
     
+    const savedMods = loadSavedMods();
+    const modEntry = {
+      name: modData.name || path.basename(modDir),
+      path: modDir,
+      characters: characters
+    };
+    
+    // Check if mod already exists, update if it does
+    const existingIndex = savedMods.findIndex(m => m.path === modDir);
+    if (existingIndex !== -1) {
+      savedMods[existingIndex] = modEntry;
+    } else {
+      savedMods.push(modEntry);
+    }
+    
+    saveMods(savedMods);
+
     event.reply('mod-imported', {
       modName: modData.name || path.basename(modDir),
       characters: characters
@@ -386,19 +463,16 @@ function handleGuess(characterId, socketId) {
   var opponent;
   var guesser_character
 
-  console.log(socketId)
-
   if (gameRoom.gameState.player1.id === socketId) {
     opponent = gameRoom.gameState.player2;
-    guesser_character = gameRoom.gameState.player1;
+    guesser_character = gameRoom.gameState.player1.character;
   }
   else {
     opponent = gameRoom.gameState.player1;
-    guesser_character = gameRoom.gameState.player2;
+    guesser_character = gameRoom.gameState.player2.character;
   }
   
   const guesser = gameRoom.gameState.player1.id === socketId ? gameRoom.gameState.player1 : gameRoom.gameState.player2;
-  // const opponent = gameRoom.gameState.player2.id === socketId ? gameRoom.gameState.player2 : gameRoom.gameState.player1;
 
   console.log(guesser)
   console.log(opponent)
@@ -411,8 +485,10 @@ function handleGuess(characterId, socketId) {
   if (isCorrect) {
     const gameOverData = {
       winner: socketId,
-      guesser_character: guesser.character,
-      opponent_character: opponent.character
+      guesser_character: guesser_character,
+      guesser_name: guesser.name,
+      opponent_character: opponent.character,
+      opponent_name: opponent.name
     };
     
     if (io) {
@@ -422,7 +498,7 @@ function handleGuess(characterId, socketId) {
   } else {
     const gameOverData = {
       winner: opponent.id,
-      guesser_character: guesser.character,
+      guesser_character: guesser_character,
       guesser_name: guesser.name,
       opponent_character: opponent.character,
       opponent_name: opponent.name

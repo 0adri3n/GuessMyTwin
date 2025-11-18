@@ -4,7 +4,6 @@
   box-sizing: border-box;
 }
 
-/* Added CSS variables for theme support */
 :root {
   --bg-primary: #667eea;
   --bg-secondary: #764ba2;
@@ -37,15 +36,19 @@
   --modal-bg: rgba(0, 0, 0, 0.85);
 }
 
+/* Changed to Consola font and fullscreen flexible layout */
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
   padding: 20px;
   transition: background 0.3s ease;
+  overflow: hidden;
 }
 
-/* Added theme toggle button styles */
 .theme-toggle {
   position: fixed;
   top: 20px;
@@ -69,15 +72,22 @@ body {
   transform: scale(1.1);
 }
 
+/* Made container flexible to fill height */
 .container {
-  max-width: 1400px;
+  max-width: 1600px;
+  width: 100%;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   color: white;
+  flex-shrink: 0;
 }
 
 .title {
@@ -96,7 +106,7 @@ body {
 
 .info-card {
   background: rgba(255, 255, 255, 0.2);
-  padding: 10px 20px;
+  padding: 8px 16px;
   border-radius: 15px;
   backdrop-filter: blur(10px);
 }
@@ -110,16 +120,20 @@ body {
   font-weight: bold;
 }
 
+/* Made game content flexible to fill available space */
 .game-content {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 280px 1fr;
   gap: 20px;
+  flex: 1;
+  min-height: 0;
 }
 
 .sidebar {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 15px;
+  min-height: 0;
 }
 
 .your-character-card {
@@ -128,6 +142,7 @@ body {
   padding: 20px;
   box-shadow: 0 5px 15px var(--shadow-color);
   transition: background 0.3s ease;
+  flex-shrink: 0;
 }
 
 .your-character-card h3 {
@@ -146,8 +161,8 @@ body {
 }
 
 .character-display img {
-  width: 150px;
-  height: 150px;
+  width: 120px;
+  height: 120px;
   border-radius: 15px;
   object-fit: cover;
   border: 4px solid #667eea;
@@ -155,7 +170,7 @@ body {
 }
 
 .character-display p {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: bold;
   color: var(--text-primary);
 }
@@ -177,12 +192,13 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
+   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .btn-guess {
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   color: white;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
 }
 
 .btn-guess:hover {
@@ -193,32 +209,36 @@ body {
 .game-status {
   background: var(--card-bg);
   border-radius: 20px;
-  padding: 20px;
+  padding: 15px;
   box-shadow: 0 5px 15px var(--shadow-color);
   text-align: center;
   color: var(--text-secondary);
   line-height: 1.6;
   transition: background 0.3s ease;
+  font-size: 0.9rem;
+  flex-shrink: 0;
 }
 
+/* Made characters grid flexible with proper scrolling */
 .characters-grid {
   background: var(--card-bg);
   border-radius: 20px;
-  padding: 30px;
+  padding: 20px;
   box-shadow: 0 5px 15px var(--shadow-color);
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 15px;
-  max-height: calc(100vh - 200px);
-  overflow-y: auto;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+  align-content: start;
   transition: background 0.3s ease;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .character-card {
   background: var(--character-card-bg);
   border: 3px solid var(--character-card-border);
-  border-radius: 15px;
-  padding: 15px;
+  border-radius: 12px;
+  padding: 12px;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s;
@@ -243,23 +263,23 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 3rem;
+  font-size: 2.5rem;
 }
 
 .character-card img {
   width: 100%;
-  height: 120px;
+  height: 100px;
   object-fit: cover;
-  border-radius: 10px;
-  margin-bottom: 10px;
+  border-radius: 8px;
+  margin-bottom: 8px;
 }
 
 .character-card p {
   font-weight: 600;
   color: var(--text-primary);
+  font-size: 0.9rem;
 }
 
-/* Modal */
 .modal {
   display: none;
   position: fixed;
@@ -304,8 +324,8 @@ body {
 
 .guess-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
   margin: 20px 0;
 }
 
@@ -326,7 +346,7 @@ body {
 
 .guess-card img {
   width: 100%;
-  height: 100px;
+  height: 90px;
   object-fit: cover;
   border-radius: 8px;
   margin-bottom: 8px;
@@ -357,8 +377,8 @@ body {
 }
 
 .game-over-character img {
-  width: 200px;
-  height: 200px;
+  width: 180px;
+  height: 180px;
   border-radius: 20px;
   object-fit: cover;
   border: 4px solid #667eea;
@@ -366,7 +386,7 @@ body {
 }
 
 .game-over-character p {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: bold;
   color: var(--text-primary);
 }
@@ -377,7 +397,13 @@ body {
   }
   
   .sidebar {
+    display: grid;
     grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+  
+  .characters-grid {
+    max-height: 60vh;
   }
 }
 
@@ -387,6 +413,6 @@ body {
   }
   
   .characters-grid {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
   }
 }

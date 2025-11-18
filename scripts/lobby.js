@@ -12,6 +12,8 @@ const themeToggle = document.getElementById('themeToggle');
 const importModBtn = document.getElementById('importModBtn');
 const customModInfo = document.getElementById('customModInfo');
 const customModName = document.getElementById('customModName');
+const savedModsSelect = document.getElementById('savedModsSelect');
+const loadSavedModBtn = document.getElementById('loadSavedModBtn');
 
 let players = [];
 let customMod = null;
@@ -70,7 +72,43 @@ if (!isHost) {
   console.log('[v0] Guest: Waiting for host to start game...');
 } else {
   console.log('[v0] Host: Waiting for guest to join...');
+  ipcRenderer.send('get-saved-mods');
 }
+
+ipcRenderer.on('saved-mods-loaded', (event, data) => {
+  console.log('[v0] Saved mods loaded:', data.mods.length);
+  savedModsSelect.innerHTML = '<option value="">-- Select a saved mod --</option>';
+  data.mods.forEach((mod, index) => {
+    const option = document.createElement('option');
+    option.value = index;
+    option.textContent = mod.name;
+    savedModsSelect.appendChild(option);
+  });
+  
+  // Store mods data for later use
+  savedModsSelect.dataset.mods = JSON.stringify(data.mods);
+});
+
+loadSavedModBtn.addEventListener('click', () => {
+  const selectedIndex = savedModsSelect.value;
+  if (selectedIndex === '') {
+    alert('Please select a mod to load');
+    return;
+  }
+  
+  const mods = JSON.parse(savedModsSelect.dataset.mods || '[]');
+  const selectedMod = mods[selectedIndex];
+  
+  if (selectedMod) {
+    console.log('[v0] Loading saved mod:', selectedMod.name);
+    customMod = {
+      modName: selectedMod.name,
+      characters: selectedMod.characters
+    };
+    customModInfo.style.display = 'flex';
+    customModName.textContent = selectedMod.name;
+  }
+});
 
 importModBtn.addEventListener('click', () => {
   if (!isHost) return;
@@ -83,6 +121,7 @@ ipcRenderer.on('mod-imported', (event, data) => {
   customMod = data;
   customModInfo.style.display = 'flex';
   customModName.textContent = data.modName;
+  ipcRenderer.send('get-saved-mods');
 });
 
 ipcRenderer.on('mod-import-error', (event, data) => {

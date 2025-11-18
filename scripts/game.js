@@ -111,8 +111,8 @@ ipcRenderer.on('guess-wrong', (event, data) => {
 
 ipcRenderer.on('game-over', (event, data) => {
   const isWinner = data.winner === mySocketId;
-  var opponent_character = isWinner ? data.guesser_character : data.opponent_character;
-  var opponent_name = isWinner ? data.guesser_name : data.opponent_name;
+  var opponent_character = isWinner ? data.opponent_character : data.guesser_character;
+  var opponent_name = isWinner ? data.opponent_name : data.guesser_name;
 
   console.log(`[v0] Game over! ${isWinner ? 'You won!' : 'You lost!'}`);
   
@@ -125,8 +125,13 @@ ipcRenderer.on('game-over', (event, data) => {
   
   gameOverModal.classList.add('show');
 });
-
 backToHomeBtn.addEventListener('click', () => {
+  console.log('[v0] Going back to home, cleaning up...');
+  ipcRenderer.send('disconnect-socket');
   localStorage.clear();
+});
+
+ipcRenderer.on('socket-disconnected', () => {
+  console.log('[v0] Socket disconnected, redirecting to home...');
   window.location.href = 'home.html';
 });
