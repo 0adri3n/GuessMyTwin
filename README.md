@@ -12,7 +12,7 @@
 
 ## 📌 Features
 
-- 🎭 **Local Multiplayer** – Host games on your LAN or expose them online via ngrok  
+- 🎭 **Local Multiplayer** – Host games on your LAN or expose them online via pinggy/ngrok  
 - 🧩 **Custom Character Mods** – Create or import your own character packs  
 - 🧑‍🚀 **Player Profiles** – Personalize your name and avatar  
 - ⚡ **Real-Time Gameplay** – Fully synchronized guessing & eliminations  
