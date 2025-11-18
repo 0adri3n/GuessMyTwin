@@ -5,6 +5,8 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const { pl } = require('date-fns/locale/pl');
+const DiscordRPC = require("discord-rpc");
+
 
 let mainWindow;
 let httpServer;
@@ -72,14 +74,20 @@ ipcMain.on('create-room', (event, data) => {
   console.log('[gmt] IPC: Create room request from', data.playerName);
   
   if (httpServer) {
-    event.reply('room-created', { playerName: data.playerName, playerAvatar: data.playerAvatar });
+    // ensure avatar is sent as data URI
+    const avatarData = imageToDataUri(data.playerAvatar);
+    event.reply('room-created', { playerName: data.playerName, playerAvatar: avatarData });
     return;
   }
 
-  startServerAsHost(data.playerName, data.playerAvatar);
-  connectAsGuest('http://localhost:3000', data.playerName, data.playerAvatar, event);
+  // Convert avatar to data URI for internal usage and network transfer
+  const avatarData = imageToDataUri(data.playerAvatar);
+  console.log('[gmt] create-room: avatar received length=', (data.playerAvatar || '').length, '-> dataURI length=', (avatarData || '').length);
 
-  event.reply('room-created', { playerName: data.playerName, playerAvatar: data.playerAvatar });
+  startServerAsHost(data.playerName, avatarData);
+  connectAsGuest('http://localhost:3000', data.playerName, avatarData, event);
+
+  event.reply('room-created', { playerName: data.playerName, playerAvatar: avatarData });
 });
 
 ipcMain.on('join-room', (event, data) => {
@@ -135,21 +143,37 @@ ipcMain.on('start-game', (event, data) => {
     player2: { id: gameRoom.players[1].id, name: gameRoom.players[1].name, character: player2Character }
   };
 
+  // Prepare characters and avatars as data URIs for network transfer
+  const charactersData = characters.map(c => ({
+    id: c.id,
+    name: c.name,
+    image: imageToDataUri(c.image)
+  }));
+
+  const player1CharData = {
+    ...player1Character,
+    image: imageToDataUri(player1Character.image)
+  };
+
+  const player2CharData = {
+    ...player2Character,
+    image: imageToDataUri(player2Character.image)
+  };
+
   io.to(gameRoom.players[0].id).emit('game-started', {
-    characters: characters,
-    yourCharacter: player1Character,
+    characters: charactersData,
+    yourCharacter: player1CharData,
     yourId: gameRoom.players[0].id,
     opponentId: gameRoom.players[1].id,
-    opponent: { name: gameRoom.players[1].name, avatar: gameRoom.players[1].avatar }
-
+    opponent: { name: gameRoom.players[1].name, avatar: imageToDataUri(gameRoom.players[1].avatar) }
   });
 
   io.to(gameRoom.players[1].id).emit('game-started', {
-    characters: characters,
-    yourCharacter: player2Character,
+    characters: charactersData,
+    yourCharacter: player2CharData,
     yourId: gameRoom.players[1].id,
     opponentId: gameRoom.players[0].id,
-    opponent: { name: gameRoom.players[0].name, avatar: gameRoom.players[0].avatar }
+    opponent: { name: gameRoom.players[0].name, avatar: imageToDataUri(gameRoom.players[0].avatar) }
   });
 
   console.log('[gmt] Current game state:', gameRoom);
@@ -311,9 +335,16 @@ ipcMain.on('import-mod', async (event) => {
     
     saveMods(savedMods);
 
+    // Convert character images to data URIs for renderer/network use
+    const charactersWithData = characters.map(c => ({
+      id: c.id,
+      name: c.name,
+      image: imageToDataUri(c.image, modDir)
+    }));
+
     event.reply('mod-imported', {
       modName: modData.name || path.basename(modDir),
-      characters: characters
+      characters: charactersWithData
     });
     
     console.log('[gmt] Mod imported successfully:', modData.name);
@@ -339,18 +370,23 @@ ipcMain.on('select-avatar', async (event) => {
   }
   
   const avatarPath = result.filePaths[0];
-  event.reply('avatar-selected', { avatarPath });
+  // Return both the path and a data URI representation so renderers can display/send it directly
+  const avatarData = imageToDataUri(avatarPath);
+  console.log('[gmt] select-avatar: selected path=', avatarPath, 'dataURI length=', (avatarData || '').length);
+  event.reply('avatar-selected', { avatarPath, avatar: avatarData });
 });
 
 // Save profile to a JSON file in userData
 ipcMain.on('save-profile', (event, data) => {
   try {
+    // Ensure avatar is stored as a data URI to avoid filesystem path issues when sharing
+    const avatarData = data.avatar ? imageToDataUri(data.avatar) : '';
     const profile = {
       name: data.name || '',
-      avatar: data.avatar || ''
+      avatar: avatarData
     };
     fs.writeFileSync(PROFILE_FILE, JSON.stringify(profile, null, 2), 'utf8');
-    console.log('[gmt] Profile saved to', PROFILE_FILE);
+    console.log('[gmt] Profile saved to', PROFILE_FILE, 'avatar length=', (avatarData || '').length);
     event.reply('profile-saved', profile);
   } catch (err) {
     console.error('[gmt] Error saving profile:', err);
@@ -364,7 +400,9 @@ ipcMain.on('load-profile', (event) => {
     if (fs.existsSync(PROFILE_FILE)) {
       const raw = fs.readFileSync(PROFILE_FILE, 'utf8');
       const profile = JSON.parse(raw);
-      event.reply('profile-loaded', profile);
+      // Convert avatar path to data URI when possible
+      const avatarData = profile.avatar ? imageToDataUri(profile.avatar) : '';
+      event.reply('profile-loaded', { name: profile.name || '', avatar: avatarData });
       console.log('[gmt] Profile loaded from', PROFILE_FILE);
     } else {
       event.reply('profile-loaded', { name: '', avatar: '' });
@@ -394,7 +432,10 @@ function startServerAsHost(playerName, playerAvatar) {
     // First connection is always the host
     if (gameRoom.players.length === 0) {
       gameRoom.host = socket.id;
-      gameRoom.players = [{ id: socket.id, name: playerName, avatar: playerAvatar,ready: false }];
+      // Ensure host avatar is a data URI
+      const hostAvatar = imageToDataUri(playerAvatar);
+      console.log('[gmt] HOST: adding host player with avatar length=', (hostAvatar || '').length);
+      gameRoom.players = [{ id: socket.id, name: playerName, avatar: hostAvatar, ready: false }];
       console.log('[gmt] HOST: Host player added to room');
       
       // Notify renderer process
@@ -407,7 +448,10 @@ function startServerAsHost(playerName, playerAvatar) {
           return;
         }
 
-        gameRoom.players.push({ id: socket.id, name: data.playerName, avatar: data.playerAvatar, ready: false });
+        // Convert guest avatar to data URI if possible
+        const guestAvatar = imageToDataUri(data.playerAvatar);
+        console.log('[gmt] HOST: guest join received avatar length=', (data.playerAvatar || '').length, '-> dataURI length=', (guestAvatar || '').length);
+        gameRoom.players.push({ id: socket.id, name: data.playerName, avatar: guestAvatar, ready: false });
         
         io.emit('player-joined-event', { players: gameRoom.players });
         
@@ -467,7 +511,18 @@ function connectAsGuest(serverUrl, playerName, playerAvatar, event) {
   
   clientSocket.on('connect', () => {
     console.log('[gmt] GUEST: Connected to server');
-    clientSocket.emit('join-room', { playerName, playerAvatar });
+    // If avatar is a local file path, convert to data URI before sending
+    let avatarToSend = playerAvatar;
+    try {
+      if (avatarToSend && typeof avatarToSend === 'string' && !avatarToSend.startsWith('data:') && fs.existsSync(avatarToSend)) {
+        avatarToSend = imageToDataUri(avatarToSend);
+      }
+    } catch (err) {
+      console.warn('[gmt] Could not convert avatar to data URI:', err);
+    }
+
+    console.log('[gmt] GUEST: emitting join-room with avatar length=', (avatarToSend || '').length);
+    clientSocket.emit('join-room', { playerName, playerAvatar: avatarToSend });
   });
   
   clientSocket.on('connect_error', (error) => {
@@ -586,10 +641,56 @@ function handleGuess(characterId, socketId) {
 
 
 function imgToBase64(imagePath) {
-  const absPath = path.join(__dirname, 'assets', imagePath);
-  const file = fs.readFileSync(absPath);
-  const ext = path.extname(imagePath).substring(1);
-  return `data:image/${ext};base64,${file.toString('base64')}`;
+  try {
+    if (!imagePath) return '';
+    // If already a data URI, return as-is
+    if (typeof imagePath === 'string' && imagePath.startsWith('data:')) return imagePath;
+
+    // Resolve absolute path
+    let absPath = imagePath;
+    if (!path.isAbsolute(absPath)) {
+      absPath = path.resolve(__dirname, imagePath);
+    }
+
+    if (!fs.existsSync(absPath)) return '';
+
+    const file = fs.readFileSync(absPath);
+    const ext = path.extname(absPath).substring(1) || 'png';
+    return `data:image/${ext};base64,${file.toString('base64')}`;
+  } catch (err) {
+    console.error('[gmt] imgToBase64 error:', err);
+    return '';
+  }
+}
+
+// Convert various image references (absolute path, relative path, or data URI)
+function imageToDataUri(imageRef, baseDir) {
+  try {
+    if (!imageRef) return '';
+    if (typeof imageRef === 'string' && imageRef.startsWith('data:')) return imageRef;
+
+    let resolved = imageRef;
+
+    if (path.isAbsolute(imageRef)) {
+      resolved = imageRef;
+    } else if (baseDir && typeof imageRef === 'string') {
+      resolved = path.join(baseDir, imageRef);
+    } else if (typeof imageRef === 'string') {
+      // Try resolving relative to project root (parent of electron)
+      resolved = path.resolve(__dirname, imageRef);
+    }
+
+    if (!fs.existsSync(resolved)) {
+      return '';
+    }
+
+    const buf = fs.readFileSync(resolved);
+    const ext = path.extname(resolved).substring(1) || 'png';
+    return `data:image/${ext};base64,${buf.toString('base64')}`;
+  } catch (err) {
+    console.error('[gmt] imageToDataUri error:', err);
+    return '';
+  }
 }
 
 
@@ -653,3 +754,21 @@ app.on('window-all-closed', function () {
   }
   if (process.platform !== 'darwin') app.quit();
 });
+
+const clientId = "1440384818948079706";
+DiscordRPC.register(clientId);
+const rpc = new DiscordRPC.Client({ transport: "ipc" });
+
+const startTimestamp = new Date();
+
+rpc.on("ready", () => {
+  rpc.setActivity({
+    details: "Guessing with twin...",
+    largeImageKey: "logo_v1",
+    largeImageText: "Guess My Twin",
+    instance: false,
+    startTimestamp,
+  });  
+});
+
+rpc.login({ clientId }).catch(console.error);

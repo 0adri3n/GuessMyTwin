@@ -189,6 +189,7 @@ function updatePlayersList() {
     const playerCard = document.createElement('div');
     
     if (players[i]) {
+      console.log('[gmt] Displaying player in lobby:', players[i]);
       playerCard.className = 'player-card';
       const avatarHtml = players[i].avatar 
       ? `<div class="player-avatar"><img src="${players[i].avatar}" alt="Avatar"></div>`

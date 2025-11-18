@@ -86,11 +86,12 @@ uploadAvatarBtn.addEventListener('click', () => {
 
 ipcRenderer.on('avatar-selected', (event, data) => {
   const img = document.createElement('img');
-  img.src = data.avatarPath;
+  // prefer data URI if provided, fall back to path
+  img.src = data.avatar || data.avatarPath || '';
   avatarPreview.innerHTML = '';
   avatarPreview.appendChild(img);
-  // update current profile avatar immediately
-  currentProfile.avatar = data.avatarPath;
+  // update current profile avatar immediately with data URI when available
+  currentProfile.avatar = data.avatar || data.avatarPath || '';
 });
 
 saveProfileBtn.addEventListener('click', () => {

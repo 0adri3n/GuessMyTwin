@@ -46,7 +46,7 @@ GuessMyTwin-Setup.exe
 ```bash
 git clone https://github.com/0adri3n/GuessMyTwin.git
 cd guessmytwin
-npm install
+npm install --force
 npm run dev
 ````
 
@@ -192,7 +192,7 @@ guessmytwin/
 ## 🛠 Development
 
 ```bash
-npm install
+npm install --force
 ```
 
 ### Run in Dev Mode
