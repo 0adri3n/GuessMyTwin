@@ -129,7 +129,7 @@ ngrok http 3000
 
 ## Project Structure
 
-\`\`\`
+```
 guessmytwin/
 ├── main.js              # Electron main process & Socket.IO server
 ├── pages/               # HTML pages
@@ -147,7 +147,7 @@ guessmytwin/
 └── assets/             # Character images and resources
     ├── classic/
     └── animals/
-\`\`\`
+```
 
 ## Technologies Used
 
@@ -160,15 +160,15 @@ guessmytwin/
 
 ### Running in Development
 
-\`\`\`bash
+```bash
 npm start
-\`\`\`
+```
 
 ### Building for Production
 
-\`\`\`bash
+```bash
 npm run build
-\`\`\`
+```
 
 ## Troubleshooting
 
