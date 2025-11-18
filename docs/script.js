@@ -76,7 +76,14 @@ const mods = [
         description: "All 167 champions from League of Legends",
         icon: "🦸",
         filename: "lol-pack.zip"
-    }
+    },
+    {
+        name: "Movies Pack",
+        author: "0adri3n",
+        description: "91 movies (twitter lovely made)",
+        icon: "🎬",
+        filename: "movies-pack.zip"
+    } 
 ];
 
 // Populate mods on community page
